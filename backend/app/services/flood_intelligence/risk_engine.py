@@ -11,10 +11,20 @@ from backend.app.schemas.risk import (
 
 class FloodIntelligenceEngine:
     """
-    Explainable Multi-Criteria Flood Risk Engine for Chennai.
-    Evaluates geographical vulnerability using normalized environmental,
-    topographical, historical, and demographic parameters.
+    Explainable Multi-Criteria Flood Risk Engine for Chennai (AHP MCDA).
+    
+    IMPORTANT SCIENTIFIC STATEMENT:
+    This model is a deterministic Multi-Criteria Decision Analysis (MCDA) model,
+    NOT a trained black-box machine learning model. It evaluates vulnerability using
+    mathematically normalized environmental, elevation, drainage, and historical records.
     """
+
+    # Macro-regional baseline defaults for missing value imputation
+    DEFAULT_ELEVATION_M = 6.5
+    DEFAULT_HISTORICAL_RISK = 0.50
+    DEFAULT_DRAINAGE_DENSITY = 1.20
+    DEFAULT_VULNERABILITY = 0.60
+    DEFAULT_POPULATION = 200000
 
     def __init__(self, data_path: Optional[Path] = None):
         self.data_path = data_path or (settings.DATA_DIR / "chennai_zones.json")
@@ -24,7 +34,10 @@ class FloodIntelligenceEngine:
         if not self.data_path.exists():
             raise FileNotFoundError(f"Zones dataset not found at {self.data_path}")
         with open(self.data_path, "r", encoding="utf-8") as f:
-            return json.load(f)
+            raw = json.load(f)
+        if isinstance(raw, dict) and "zones" in raw:
+            return raw["zones"]
+        return raw
 
     def evaluate_zone_risk(
         self,
@@ -35,29 +48,56 @@ class FloodIntelligenceEngine:
         is_simulated: bool = True
     ) -> ZoneRiskAssessment:
         w = weights or RiskWeights()
+        imputed_features: List[str] = []
 
-        # 1. Input Normalisation (0.0 to 1.0 scale)
-        # 350mm represents historic 24h deluge (2015/Michaung magnitude)
-        r_norm = min(1.0, max(0.0, rainfall_mm / 350.0))
+        # 1. Feature Normalisation & Missing Data Handling
         
-        # Elevation: Chennai max elevation ~20m; below 5m is severe flood zone
-        elev = zone.get("baseline_elevation_m", 6.0)
+        # Rainfall: clamp between 0.0 and 800.0 mm
+        clamped_rain = max(0.0, min(800.0, float(rainfall_mm)))
+        r_norm = min(1.0, clamped_rain / 350.0)
+
+        # Elevation (SRTM): handle missing or non-positive values
+        raw_elev = zone.get("baseline_elevation_m")
+        if raw_elev is None or raw_elev <= 0:
+            elev = self.DEFAULT_ELEVATION_M
+            imputed_features.append("baseline_elevation_m")
+        else:
+            elev = float(raw_elev)
+        # Normalisation: lower elevation (towards sea level) = higher vulnerability
         e_norm = max(0.0, min(1.0, (20.0 - elev) / 20.0))
-        
-        # Historical flood risk (2015 & 2023 records: 0.0 to 1.0)
-        h_norm = float(zone.get("historical_flood_risk", 0.5))
-        
-        # Drainage density: high density (>2.5 km/km2) clears water faster; low (<1.0) stagnates
-        drain = zone.get("drainage_density_km_per_sq_km", 1.2)
-        d_norm = max(0.0, min(1.0, (2.5 - drain) / 2.5))
-        
-        # Dynamic water level proxy (0.0 to 1.0)
-        wl_norm = min(1.0, max(0.0, water_level_index))
-        
-        # Demographic vulnerability index
-        v_norm = float(zone.get("vulnerability_index", 0.6))
 
-        # 2. Weighted Factor Contribution
+        # Historical flood risk: handle missing
+        raw_hist = zone.get("historical_flood_risk")
+        if raw_hist is None or not (0.0 <= raw_hist <= 1.0):
+            hist = self.DEFAULT_HISTORICAL_RISK
+            imputed_features.append("historical_flood_risk")
+        else:
+            hist = float(raw_hist)
+        h_norm = hist
+
+        # Drainage density: handle missing
+        raw_drain = zone.get("drainage_density_km_per_sq_km")
+        if raw_drain is None or raw_drain <= 0:
+            drain = self.DEFAULT_DRAINAGE_DENSITY
+            imputed_features.append("drainage_density_km_per_sq_km")
+        else:
+            drain = float(raw_drain)
+        # Lower density (< 1.0) = slower runoff evacuation = higher risk
+        d_norm = max(0.0, min(1.0, (2.5 - drain) / 2.5))
+
+        # Water level proxy: clamp between 0.0 and 1.0
+        wl_norm = max(0.0, min(1.0, float(water_level_index)))
+
+        # Demographic vulnerability index
+        raw_vuln = zone.get("vulnerability_index")
+        if raw_vuln is None or not (0.0 <= raw_vuln <= 1.0):
+            vuln = self.DEFAULT_VULNERABILITY
+            imputed_features.append("vulnerability_index")
+        else:
+            vuln = float(raw_vuln)
+        v_norm = vuln
+
+        # 2. Weighted Factor Contribution Breakdown
         contrib_rain = w.rainfall * r_norm * 100.0
         contrib_elev = w.elevation * e_norm * 100.0
         contrib_hist = w.historical * h_norm * 100.0
@@ -85,14 +125,19 @@ class FloodIntelligenceEngine:
             category = "Critical"
             priority = 1
 
-        # 4. Exposed Population Estimation
-        pop = zone.get("population", 200000)
+        # 4. Population Exposure Calculation
+        pop = int(zone.get("population") or self.DEFAULT_POPULATION)
         exposed_pop = int(pop * (risk_score / 100.0) * (0.4 + 0.6 * v_norm))
 
         # 5. Data Confidence Calculation
-        # Elevation and historical are verified OBSERVED/HISTORICAL (weight 0.5)
-        # Rainfall and water level in demo are SIMULATED (weight 0.5)
-        confidence = 0.94 if not is_simulated else 0.88
+        # Base confidence: 0.96 for complete verified records
+        # Deduct 0.08 if simulated scenario inputs
+        # Deduct 0.15 for each imputed missing feature
+        confidence = 0.96
+        if is_simulated:
+            confidence -= 0.08
+        confidence -= (len(imputed_features) * 0.15)
+        confidence = round(max(0.10, min(1.0, confidence)), 2)
 
         contributing = ContributingFactors(
             rainfall_contribution=round(contrib_rain, 1),
@@ -103,13 +148,15 @@ class FloodIntelligenceEngine:
             vulnerability_contribution=round(contrib_vuln, 1),
         )
 
+        provenance = "SIMULATED" if is_simulated else "MODEL_ESTIMATE"
+
         return ZoneRiskAssessment(
             zone_id=zone["zone_id"],
             name=zone["name"],
             region=zone["region"],
             centroid=zone["centroid"],
             population=pop,
-            area_sq_km=zone.get("area_sq_km", 20.0),
+            area_sq_km=float(zone.get("area_sq_km", 20.0)),
             baseline_elevation_m=elev,
             flood_risk_score=risk_score,
             risk_category=category,
@@ -118,7 +165,8 @@ class FloodIntelligenceEngine:
             recommended_priority=priority,
             data_confidence=confidence,
             data_source="IMD_GCC_SRTM_MCDA_COMPOSITE",
-            provenance="SIMULATED" if is_simulated else "MODEL_ESTIMATE",
+            provenance=provenance,
+            imputed_features=imputed_features,
             notes=f"Waterbody: {zone.get('major_waterbody', 'N/A')}. Elevation: {elev}m."
         )
 
@@ -136,7 +184,7 @@ class FloodIntelligenceEngine:
 
         total_zones = len(results)
         avg_score = round(sum(r.flood_risk_score for r in results) / total_zones, 1) if total_zones else 0.0
-        
+
         category_counts: Dict[str, int] = {
             "Low": 0, "Moderate": 0, "High": 0, "Very High": 0, "Critical": 0
         }

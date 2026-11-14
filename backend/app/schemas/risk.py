@@ -33,6 +33,7 @@ class ZoneRiskAssessment(BaseModel):
     data_confidence: float = Field(..., ge=0.0, le=1.0)
     data_source: str = "IMD_GCC_SRTM_HYBRID"
     provenance: str = "MODEL_ESTIMATE"  # "OBSERVED", "HISTORICAL", "MODEL_ESTIMATE", "SIMULATED"
+    imputed_features: List[str] = []
     notes: Optional[str] = None
 
 class RiskEvaluationRequest(BaseModel):

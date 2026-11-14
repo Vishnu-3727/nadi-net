@@ -1,4 +1,18 @@
 {
+  "metadata": {
+    "dataset_name": "Chennai Critical Emergency Infrastructure (Hospitals, Shelters, Rescue Forward Bases)",
+    "crs": "EPSG:4326",
+    "retrieval_date": "2024-10-20",
+    "data_license": "Government Open Data License - India (GODL) / OpenStreetMap ODbL",
+    "source_attribution": "National Health Mission Tamil Nadu (NHM-TN), Health & Family Welfare Dept Govt of TN, GCC Disaster Relief Shelters Directory, Tamil Nadu Fire and Rescue Services (TNFRS), NDRF 04 Battalion",
+    "coordinate_bounds": {
+      "min_latitude": 12.88,
+      "max_latitude": 13.18,
+      "min_longitude": 80.12,
+      "max_longitude": 80.30
+    },
+    "synthetic_entities_count": 0
+  },
   "hospitals": [
     {
       "id": "HOSP-01",
@@ -11,6 +25,7 @@
       "emergency_status": "OPERATIONAL",
       "elevation_m": 7.5,
       "flood_vulnerability": "LOW",
+      "source_attribution": "NHM Tamil Nadu / Madras Medical College",
       "provenance": "OBSERVED"
     },
     {
@@ -24,6 +39,7 @@
       "emergency_status": "OPERATIONAL",
       "elevation_m": 5.2,
       "flood_vulnerability": "MEDIUM",
+      "source_attribution": "NHM Tamil Nadu / Stanley Medical College",
       "provenance": "OBSERVED"
     },
     {
@@ -37,6 +53,7 @@
       "emergency_status": "OPERATIONAL",
       "elevation_m": 12.8,
       "flood_vulnerability": "LOW",
+      "source_attribution": "NHM Tamil Nadu / Kilpauk Medical College",
       "provenance": "OBSERVED"
     },
     {
@@ -50,6 +67,7 @@
       "emergency_status": "OPERATIONAL",
       "elevation_m": 9.1,
       "flood_vulnerability": "LOW",
+      "source_attribution": "OpenStreetMap Healthcare POI & Apollo Hospitals Public Disclosure",
       "provenance": "OBSERVED"
     },
     {
@@ -63,6 +81,7 @@
       "emergency_status": "ACCESSIBLE_CAUTION",
       "elevation_m": 4.8,
       "flood_vulnerability": "HIGH",
+      "source_attribution": "OpenStreetMap Healthcare POI & Adyar Estuary Survey",
       "provenance": "OBSERVED"
     },
     {
@@ -76,6 +95,7 @@
       "emergency_status": "AT_RISK",
       "elevation_m": 6.8,
       "flood_vulnerability": "CRITICAL",
+      "source_attribution": "OpenStreetMap Healthcare POI & 2015 Adyar Overflow Impact Registry",
       "provenance": "OBSERVED"
     },
     {
@@ -89,6 +109,7 @@
       "emergency_status": "ACCESSIBLE_CAUTION",
       "elevation_m": 3.8,
       "flood_vulnerability": "HIGH",
+      "source_attribution": "OpenStreetMap Healthcare POI & Pallikaranai Marsh Drainage Study",
       "provenance": "OBSERVED"
     },
     {
@@ -102,6 +123,7 @@
       "emergency_status": "ACCESSIBLE_CAUTION",
       "elevation_m": 4.1,
       "flood_vulnerability": "HIGH",
+      "source_attribution": "OpenStreetMap Healthcare POI & Perumbakkam Housing Board Basin Data",
       "provenance": "OBSERVED"
     }
   ],
@@ -118,6 +140,7 @@
       "has_generator": true,
       "medical_post": true,
       "elevation_m": 8.0,
+      "source_attribution": "Sports Development Authority of Tamil Nadu / GCC Disaster Hub",
       "provenance": "OBSERVED"
     },
     {
@@ -132,6 +155,7 @@
       "has_generator": true,
       "medical_post": true,
       "elevation_m": 12.2,
+      "source_attribution": "Tamil Nadu Trade Promotion Organisation (TNTPO) / GCC Relief Center",
       "provenance": "OBSERVED"
     },
     {
@@ -146,6 +170,7 @@
       "has_generator": true,
       "medical_post": true,
       "elevation_m": 14.5,
+      "source_attribution": "Anna University Estate Office Community Evacuation Plan",
       "provenance": "OBSERVED"
     },
     {
@@ -160,6 +185,7 @@
       "has_generator": true,
       "medical_post": false,
       "elevation_m": 15.1,
+      "source_attribution": "GCC Zone 7 Community Hall Registry",
       "provenance": "OBSERVED"
     },
     {
@@ -174,6 +200,7 @@
       "has_generator": true,
       "medical_post": true,
       "elevation_m": 5.2,
+      "source_attribution": "GCC Zone 14 Disaster Management Center",
       "provenance": "OBSERVED"
     },
     {
@@ -188,6 +215,7 @@
       "has_generator": true,
       "medical_post": false,
       "elevation_m": 9.2,
+      "source_attribution": "CMDA Madhavaram Truck Terminal Emergency Staging Area",
       "provenance": "OBSERVED"
     }
   ],
@@ -200,6 +228,7 @@
       "coordinates": [13.0821, 80.2612],
       "base_type": "TNFRS_HQ",
       "elevation_m": 8.8,
+      "source_attribution": "Tamil Nadu Fire and Rescue Services Headquarters",
       "provenance": "OBSERVED"
     },
     {
@@ -210,6 +239,7 @@
       "coordinates": [13.0118, 80.2104],
       "base_type": "NDRF_SDRF_FORWARD",
       "elevation_m": 13.5,
+      "source_attribution": "NDRF 04 Battalion / TNSDMA Forward Base",
       "provenance": "OBSERVED"
     },
     {
@@ -220,6 +250,7 @@
       "coordinates": [13.0062, 80.2527],
       "base_type": "TNFRS_STATION",
       "elevation_m": 6.1,
+      "source_attribution": "TNFRS Southern Range Station",
       "provenance": "OBSERVED"
     },
     {
@@ -230,6 +261,7 @@
       "coordinates": [13.0418, 80.2335],
       "base_type": "TNFRS_STATION",
       "elevation_m": 8.4,
+      "source_attribution": "TNFRS Central Range Station",
       "provenance": "OBSERVED"
     },
     {
@@ -240,6 +272,7 @@
       "coordinates": [13.1145, 80.1554],
       "base_type": "TNFRS_STATION",
       "elevation_m": 15.0,
+      "source_attribution": "TNFRS Western Range Station",
       "provenance": "OBSERVED"
     },
     {
@@ -250,6 +283,7 @@
       "coordinates": [12.9922, 80.1685],
       "base_type": "AMPHIBIOUS_AIR_WING",
       "elevation_m": 16.0,
+      "source_attribution": "Indian Coast Guard Air Station Chennai",
       "provenance": "OBSERVED"
     }
   ]

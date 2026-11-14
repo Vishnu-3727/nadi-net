@@ -18,8 +18,10 @@ def get_risk_zones(db: Session = Depends(get_db)):
 @router.get("/zones/{zone_id}", response_model=ZoneRiskAssessment)
 def get_zone_by_id(zone_id: int, db: Session = Depends(get_db)):
     zones_resp = get_risk_zones(db)
-    for z in zones_resp.zones:
-        if z.zone_id == zone_id:
+    zones_list = zones_resp["zones"] if isinstance(zones_resp, dict) else zones_resp.zones
+    for z in zones_list:
+        zid = z["zone_id"] if isinstance(z, dict) else z.zone_id
+        if zid == zone_id:
             return z
     raise HTTPException(status_code=404, detail=f"Zone {zone_id} not found in Chennai risk registry.")
 

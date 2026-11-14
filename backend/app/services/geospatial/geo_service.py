@@ -21,7 +21,8 @@ def haversine_distance_km(coord1: List[float], coord2: List[float]) -> float:
 class GeospatialService:
     def __init__(self, data_dir: Optional[Path] = None):
         self.data_dir = data_dir or settings.DATA_DIR
-        self.zones = self._load_json("chennai_zones.json")
+        raw_zones = self._load_json("chennai_zones.json")
+        self.zones = raw_zones.get("zones", raw_zones) if isinstance(raw_zones, dict) else raw_zones
         self.facilities = self._load_json("chennai_facilities.json")
         self.road_data = self._load_json("chennai_road_network.json")
 
