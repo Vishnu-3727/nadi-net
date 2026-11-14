@@ -1,0 +1,47 @@
+[
+  {
+    "id": "SCN-A",
+    "name": "Scenario A — Moderate Monsoon Flooding",
+    "severity": "MODERATE",
+    "rainfall_intensity_mm": 85.0,
+    "water_level_index": 0.35,
+    "description": "Localized waterlogging in low-lying sections of North Chennai; major arterial corridors and bridges remain operational.",
+    "blocked_edge_ids": ["E03"],
+    "available_rescue_teams": 12,
+    "available_inflatable_boats": 15,
+    "available_food_packets": 6000,
+    "available_drinking_water_litres": 15000,
+    "available_medical_kits": 900,
+    "provenance": "SIMULATED"
+  },
+  {
+    "id": "SCN-B",
+    "name": "Scenario B — Severe Urban Inundation",
+    "severity": "SEVERE",
+    "rainfall_intensity_mm": 245.0,
+    "water_level_index": 0.72,
+    "description": "Adyar river and Buckingham canal discharge peak; key arterial river bridges and Pallikaranai marsh causeway submerged.",
+    "blocked_edge_ids": ["E03", "E18", "E21", "E25"],
+    "available_rescue_teams": 7,
+    "available_inflatable_boats": 8,
+    "available_food_packets": 3200,
+    "available_drinking_water_litres": 7500,
+    "available_medical_kits": 450,
+    "provenance": "SIMULATED"
+  },
+  {
+    "id": "SCN-C",
+    "name": "Scenario C — Critical Multi-Basin Emergency",
+    "severity": "CRITICAL",
+    "rainfall_intensity_mm": 430.0,
+    "water_level_index": 0.95,
+    "description": "Catastrophic event analogous to historic 2015/Michaung flood. Cooum, Adyar, and Kosasthalaiyar basins breach; extensive road network severance.",
+    "blocked_edge_ids": ["E03", "E04", "E18", "E20", "E21", "E25", "E28", "E29"],
+    "available_rescue_teams": 4,
+    "available_inflatable_boats": 4,
+    "available_food_packets": 1600,
+    "available_drinking_water_litres": 3600,
+    "available_medical_kits": 250,
+    "provenance": "SIMULATED"
+  }
+]
