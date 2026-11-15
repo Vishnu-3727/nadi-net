@@ -51,10 +51,11 @@ export const ChennaiMap: React.FC<Props> = ({
         attributionControl: false,
       });
 
-      // Dark Matter CartoDB Basemap (graceful offline fallback)
-      const tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+      // OpenStreetMap Free Basemap with dark tactical filter (100% Free, Zero API Key required)
+      const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
-        subdomains: 'abcd',
+        attribution: '&copy; OpenStreetMap contributors',
+        className: 'dark-map-tiles',
       });
 
       tileLayer.on('tileerror', () => {
