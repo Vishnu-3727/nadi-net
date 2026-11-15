@@ -63,11 +63,11 @@ export const ChennaiMap: React.FC<Props> = ({
         attributionControl: false,
       });
 
-      // OpenStreetMap Free Basemap with dark tactical filter (100% Free, Zero API Key required)
+      // OpenStreetMap Free Basemap (100% Free, Zero API Key required, Clean GovTech cartography)
       const tileLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 18,
         attribution: '&copy; OpenStreetMap contributors',
-        className: 'dark-map-tiles',
+        className: 'govtech-map-tiles',
       });
 
       tileLayer.on('tileerror', () => {
@@ -325,17 +325,17 @@ export const ChennaiMap: React.FC<Props> = ({
       <div ref={mapContainerRef} style={{ height }} className="z-10" />
 
       {/* Floating Layer Controls */}
-      <div className="absolute top-3.5 right-3.5 z-[1000] flex flex-wrap items-center gap-1.5 bg-zinc-900/90 backdrop-blur-md p-1.5 rounded-xl border border-zinc-800 shadow-lg">
+      <div className="absolute top-3.5 right-3.5 z-[1000] flex flex-wrap items-center gap-1.5 bg-white/95 backdrop-blur-md p-1.5 rounded-xl border border-slate-200/90 shadow-md">
         <button
           onClick={() => setShowZones(!showZones)}
           className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition cursor-pointer ${
             showZones
-              ? 'bg-zinc-700 text-white border border-zinc-600 shadow-sm'
-              : 'text-zinc-400 hover:text-white bg-transparent border border-transparent'
+              ? 'bg-slate-800 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
           title="Toggle 15 GCC Zones"
         >
-          <MapPin className="w-3 h-3 text-amber-400" />
+          <MapPin className="w-3 h-3 text-amber-500" />
           <span>Zones</span>
         </button>
 
@@ -343,12 +343,12 @@ export const ChennaiMap: React.FC<Props> = ({
           onClick={() => setShowRoads(!showRoads)}
           className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition cursor-pointer ${
             showRoads
-              ? 'bg-zinc-700 text-white border border-zinc-600 shadow-sm'
-              : 'text-zinc-400 hover:text-white bg-transparent border border-transparent'
+              ? 'bg-slate-800 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
           title="Toggle Arterial Road Graph"
         >
-          <Navigation className="w-3 h-3 text-sky-400" />
+          <Navigation className="w-3 h-3 text-sky-600" />
           <span>Roads</span>
         </button>
 
@@ -356,12 +356,12 @@ export const ChennaiMap: React.FC<Props> = ({
           onClick={() => setShowHospitals(!showHospitals)}
           className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition cursor-pointer ${
             showHospitals
-              ? 'bg-zinc-700 text-white border border-zinc-600 shadow-sm'
-              : 'text-zinc-400 hover:text-white bg-transparent border border-transparent'
+              ? 'bg-slate-800 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
           title="Toggle Major Hospitals"
         >
-          <Building2 className="w-3 h-3 text-emerald-400" />
+          <Building2 className="w-3 h-3 text-emerald-600" />
           <span>Hospitals</span>
         </button>
 
@@ -369,18 +369,18 @@ export const ChennaiMap: React.FC<Props> = ({
           onClick={() => setShowShelters(!showShelters)}
           className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition cursor-pointer ${
             showShelters
-              ? 'bg-zinc-700 text-white border border-zinc-600 shadow-sm'
-              : 'text-zinc-400 hover:text-white bg-transparent border border-transparent'
+              ? 'bg-slate-800 text-white shadow-xs'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
           }`}
           title="Toggle Evacuation Shelters"
         >
-          <Tent className="w-3 h-3 text-indigo-400" />
+          <Tent className="w-3 h-3 text-indigo-600" />
           <span>Shelters</span>
         </button>
 
         <button
           onClick={handleRecenter}
-          className="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 transition cursor-pointer"
+          className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition cursor-pointer"
           title="Recenter Map on Chennai"
         >
           <Compass className="w-3.5 h-3.5" />
@@ -388,29 +388,29 @@ export const ChennaiMap: React.FC<Props> = ({
       </div>
 
       {/* Map Layer Legend Overlay */}
-      <div className="absolute bottom-3.5 left-3.5 z-[1000] bg-zinc-900/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-zinc-800 text-[11px] text-zinc-300 flex flex-wrap gap-x-4 gap-y-1.5 shadow-lg">
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-red-500" />
+      <div className="absolute bottom-3.5 left-3.5 z-[1000] bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-xl border border-slate-200 text-[11px] text-slate-700 flex flex-wrap gap-x-4 gap-y-1.5 shadow-md">
+        <div className="flex items-center gap-1.5 font-medium">
+          <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
           <span>Critical Zone</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-amber-400" />
+        <div className="flex items-center gap-1.5 font-medium">
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
           <span>High Risk Zone</span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 font-medium">
           <span className="w-3.5 h-0.5 border-t-2 border-dashed border-red-500" />
           <span>Submerged Bridge</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+        <div className="flex items-center gap-1.5 font-medium">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
           <span>Operational Hospital</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-indigo-400" />
+        <div className="flex items-center gap-1.5 font-medium">
+          <span className="w-2.5 h-2.5 rounded-full bg-indigo-500" />
           <span>Relief Shelter</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-teal-400" />
+        <div className="flex items-center gap-1.5 font-medium">
+          <span className="w-2.5 h-2.5 rounded-full bg-teal-500" />
           <span>Staging Post</span>
         </div>
       </div>

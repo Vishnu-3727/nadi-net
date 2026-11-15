@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
 import {
   AlertTriangle,
-  AlertCircle,
-  Truck,
-  Building2,
   Users,
-  Shield,
-  Clock,
-  ArrowRight,
-  ExternalLink,
-  MapPin,
-  LifeBuoy,
-  Waves,
+  ShieldCheck,
+  Building2,
   Navigation,
+  ArrowRight,
+  TrendingUp,
+  MapPin,
+  Clock,
   CheckCircle2,
   Radio,
   Activity,
@@ -32,6 +28,7 @@ import {
 } from '../types';
 import { ChennaiMap } from '../components/ChennaiMap';
 import { ProvenanceBadge } from '../components/ProvenanceBadge';
+import { NavTab } from '../components/Sidebar';
 
 interface Props {
   overview: CommandCenterOverviewData | null;
@@ -39,10 +36,10 @@ interface Props {
   roadNetwork: RoadNetworkData | null;
   facilities: FacilitiesData | null;
   allocations: OptimisationResultData | null;
-  reportedIncidents?: any[];
+  onNavigateTab: (tab: NavTab) => void;
   onOpenSOS?: () => void;
-  onNavigateTab: (tab: any) => void;
   onSelectZone: (zone: ZoneRiskAssessmentData) => void;
+  reportedIncidents?: any[];
 }
 
 export const CommandCentrePage: React.FC<Props> = ({
@@ -51,19 +48,19 @@ export const CommandCentrePage: React.FC<Props> = ({
   roadNetwork,
   facilities,
   allocations,
-  reportedIncidents = [],
-  onOpenSOS,
   onNavigateTab,
+  onOpenSOS,
   onSelectZone,
+  reportedIncidents = [],
 }) => {
   const [selectedZone, setSelectedZone] = useState<ZoneRiskAssessmentData | null>(null);
   const [activeTriageFilter, setActiveTriageFilter] = useState<'ALL' | 'CRITICAL' | 'VERY_HIGH'>('ALL');
 
   if (!overview) {
     return (
-      <div className="flex items-center justify-center h-full text-slate-400 font-mono">
+      <div className="flex items-center justify-center h-full text-slate-500 font-mono">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-slate-400 border-t-transparent rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-slate-500 border-t-transparent rounded-full animate-spin" />
           <span>Synchronizing Chennai Emergency Ops Grid...</span>
         </div>
       </div>
@@ -83,190 +80,215 @@ export const CommandCentrePage: React.FC<Props> = ({
     })
     .sort((a, b) => b.flood_risk_score - a.flood_risk_score);
 
+  const exposedVal = overview.metrics.find((m) => m.label.toLowerCase().includes('exposed'))?.value ?? '2,189,418';
+  const rescueVal = overview.metrics.find((m) => m.label.toLowerCase().includes('rescue'))?.value ?? '12 / 12 Assigned';
+  const hospitalVal = overview.metrics.find((m) => m.label.toLowerCase().includes('hospital'))?.value ?? `${facilities?.operational_hospitals ?? 8} / ${facilities?.total_hospitals ?? 8} Operational`;
+
+  const liveAlerts = [
+    ...reportedIncidents.map((inc) => ({
+      id: inc.id,
+      location_name: `${inc.location} (Zone ${inc.zone_id})`,
+      severity: inc.severity,
+      situation_details: inc.notes || `${inc.category}: ${inc.affected_count} citizens requiring assistance`,
+    })),
+    ...(overview.alerts || []).map((a) => ({
+      id: a.id,
+      location_name: `${a.zone_name} (Zone ${a.zone_id})`,
+      severity: a.severity,
+      situation_details: a.message,
+    })),
+  ];
+
   return (
     <div className="space-y-5 animate-in fade-in duration-300">
-      {/* 1. Tactical Mission Header HUD */}
-      <div className="bg-[#11141d] border border-[#222838] rounded-2xl p-4 sm:p-5 shadow-xl">
+      {/* 1. GovTech Mission Header HUD */}
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           {/* Situation Title & Scenario */}
           <div className="flex items-center space-x-4 min-w-0">
-            <div className="w-12 h-12 rounded-xl bg-[#181d2a] border border-[#2d354a] flex items-center justify-center shrink-0 shadow-inner">
-              <Activity className="w-6 h-6 text-amber-400" />
+            <div className="w-12 h-12 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center shrink-0 shadow-sm text-amber-400">
+              <Activity className="w-6 h-6" />
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[10px] font-mono font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                <span className="text-[10px] font-mono font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200">
                   {overview.active_severity} FLOOD ADVISORY
                 </span>
-                <span className="text-base sm:text-lg font-bold text-white tracking-tight truncate">
+                <span className="text-base sm:text-lg font-bold text-slate-900 tracking-tight truncate">
                   {overview.active_scenario_name}
                 </span>
-                <span className="text-[10px] font-mono text-slate-400 bg-[#181d2a] px-2 py-0.5 rounded-md border border-[#262e42] hidden sm:inline">
+                <span className="text-[10px] font-mono text-slate-600 bg-slate-100 px-2 py-0.5 rounded-md border border-slate-200 hidden sm:inline">
                   GCC OPS ROOM
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">
+              <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">
                 Real-time topological flood routing, multi-criteria risk scoring, and OR-Tools MILP resource dispatch
               </p>
             </div>
           </div>
 
-          {/* Quick Scenario & SOS Actions */}
-          <div className="flex items-center space-x-2.5 shrink-0 self-end lg:self-auto">
+          {/* Action CTAs */}
+          <div className="flex items-center space-x-2 shrink-0">
             {onOpenSOS && (
               <button
                 onClick={onOpenSOS}
-                className="px-4 py-2 bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white rounded-xl text-xs font-bold shadow-lg shadow-red-950/50 transition flex items-center space-x-2 cursor-pointer active:scale-95"
+                className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow-sm hover:shadow transition cursor-pointer"
               >
-                <LifeBuoy className="w-3.5 h-3.5" />
+                <Flame className="w-4 h-4 text-white" />
                 <span>Log Citizen SOS</span>
               </button>
             )}
             <button
               onClick={() => onNavigateTab('simulator')}
-              className="px-3.5 py-2 bg-[#181d2a] hover:bg-[#202738] text-slate-200 hover:text-white rounded-xl text-xs font-semibold border border-[#2d354a] transition flex items-center space-x-1.5 cursor-pointer shadow-sm"
+              className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 text-xs font-medium transition cursor-pointer"
             >
-              <Sliders className="w-3.5 h-3.5 text-slate-400" />
+              <Sliders className="w-4 h-4 text-slate-500" />
               <span>Simulate Deluge</span>
             </button>
           </div>
         </div>
 
-        {/* 4 Core Vital Metric Gauges */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 pt-4 border-t border-[#1e2333]">
-          <div className="p-3 rounded-xl bg-[#0d1017] border border-[#1e2434] flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 shrink-0">
-              <Users className="w-4 h-4" />
+        {/* 4 Core Operational Metric Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-5 pt-4 border-t border-slate-100">
+          {/* 1. Exposed Citizens */}
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div className="flex items-center justify-between text-slate-500 text-[11px] font-mono">
+              <span className="uppercase font-semibold">Exposed Citizens</span>
+              <Users className="w-3.5 h-3.5 text-slate-400" />
             </div>
-            <div className="min-w-0">
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Exposed Citizens</span>
-              <span className="text-lg font-bold text-white font-mono leading-none">
-                {overview.metrics[2]?.value || '2,189,418'}
-              </span>
+            <div className="text-lg sm:text-xl font-bold font-mono text-slate-900 mt-1">
+              {typeof exposedVal === 'number' ? exposedVal.toLocaleString() : exposedVal}
             </div>
+            <div className="text-[10px] text-slate-500 mt-0.5">Estimated residents in flood path</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-[#0d1017] border border-[#1e2434] flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
-              <Shield className="w-4 h-4" />
+          {/* 2. Rescue Units Deployed */}
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div className="flex items-center justify-between text-slate-500 text-[11px] font-mono">
+              <span className="uppercase font-semibold">Rescue Units</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
             </div>
-            <div className="min-w-0">
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Rescue Units</span>
-              <span className="text-lg font-bold text-emerald-400 font-mono leading-none">
-                {overview.metrics[3]?.value || '12 / 12 Assigned'}
-              </span>
+            <div className="text-lg sm:text-xl font-bold font-mono text-emerald-700 mt-1">
+              {rescueVal}
             </div>
+            <div className="text-[10px] text-slate-500 mt-0.5">NDRF, TNFRS & Coast Guard units</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-[#0d1017] border border-[#1e2434] flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
-              <Navigation className="w-4 h-4" />
+          {/* 3. Severed Corridors */}
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div className="flex items-center justify-between text-slate-500 text-[11px] font-mono">
+              <span className="uppercase font-semibold">Severed Bridges</span>
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
             </div>
-            <div className="min-w-0">
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Severed Bridges</span>
-              <span className="text-lg font-bold text-amber-400 font-mono leading-none">
-                {overview.metrics[4]?.value || '1 Corridor'}
-              </span>
+            <div className="text-lg sm:text-xl font-bold font-mono text-amber-700 mt-1">
+              {overview.total_blocked_roads || 1} Critical Corridors
             </div>
+            <div className="text-[10px] text-slate-500 mt-0.5">MIOT Adyar River causeway submerged</div>
           </div>
 
-          <div className="p-3 rounded-xl bg-[#0d1017] border border-[#1e2434] flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 shrink-0">
-              <Building2 className="w-4 h-4" />
+          {/* 4. Hospitals Operational */}
+          <div className="p-3 sm:p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+            <div className="flex items-center justify-between text-slate-500 text-[11px] font-mono">
+              <span className="uppercase font-semibold">Hospitals Open</span>
+              <Building2 className="w-3.5 h-3.5 text-teal-600" />
             </div>
-            <div className="min-w-0">
-              <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider block">Hospitals Open</span>
-              <span className="text-lg font-bold text-white font-mono leading-none">
-                {overview.metrics[5]?.value || '8 / 8 Active'}
-              </span>
+            <div className="text-lg sm:text-xl font-bold font-mono text-slate-900 mt-1">
+              {hospitalVal}
             </div>
+            <div className="text-[10px] text-slate-500 mt-0.5">Trauma centres with power backup</div>
           </div>
         </div>
       </div>
 
-      {/* 2. Main Mission Operations Console (3-Column Layout) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-        {/* Left Column (4 cols): GCC Zone Triage & Incident Feed */}
+      {/* 2. Main EOC Operations Grid: 3 Columns */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        {/* Left Column (4 cols): GCC Zone Inundation Triage & Citizen Distress Feed */}
         <div className="lg:col-span-4 space-y-4">
-          {/* Triage Leaderboard */}
-          <div className="bg-[#11141d] border border-[#222838] rounded-2xl p-4 shadow-xl space-y-3">
-            <div className="flex items-center justify-between">
+          {/* Zone Triage Leaderboard */}
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs space-y-3">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
               <div className="flex items-center space-x-2">
-                <MapPin className="w-4 h-4 text-amber-400" />
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono">
+                <MapPin className="w-4 h-4 text-amber-600" />
+                <h3 className="text-xs font-bold text-slate-900 uppercase font-mono tracking-wider">
                   Zone Inundation Triage
                 </h3>
               </div>
-              <div className="flex items-center space-x-1 bg-[#181d2a] p-0.5 rounded-lg border border-[#283144] text-[10px] font-mono">
+              <div className="flex items-center space-x-1 text-[10px] font-mono">
                 <button
                   onClick={() => setActiveTriageFilter('ALL')}
-                  className={`px-2 py-0.5 rounded transition ${activeTriageFilter === 'ALL' ? 'bg-[#283144] text-white font-bold' : 'text-slate-400 hover:text-white'}`}
+                  className={`px-2 py-0.5 rounded cursor-pointer ${
+                    activeTriageFilter === 'ALL'
+                      ? 'bg-slate-900 text-white font-bold'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
                 >
-                  All (15)
+                  All ({zones.length})
                 </button>
                 <button
                   onClick={() => setActiveTriageFilter('CRITICAL')}
-                  className={`px-2 py-0.5 rounded transition ${activeTriageFilter === 'CRITICAL' ? 'bg-red-500/20 text-red-400 font-bold' : 'text-slate-400 hover:text-white'}`}
+                  className={`px-2 py-0.5 rounded cursor-pointer ${
+                    activeTriageFilter === 'CRITICAL'
+                      ? 'bg-red-600 text-white font-bold'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
                 >
                   Crit
                 </button>
               </div>
             </div>
 
-            {/* Scrollable Zone Cards */}
+            {/* Scrollable Zone Triage Cards */}
             <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1">
-              {filteredZones.slice(0, 8).map((z) => {
+              {filteredZones.map((z) => {
                 const isSelected = selectedZone?.zone_id === z.zone_id;
-                const isHighRisk = z.flood_risk_score >= 60;
+                const riskColor =
+                  z.flood_risk_score >= 70
+                    ? 'text-red-700 bg-red-50 border-red-200'
+                    : z.flood_risk_score >= 50
+                    ? 'text-amber-700 bg-amber-50 border-amber-200'
+                    : 'text-emerald-700 bg-emerald-50 border-emerald-200';
+
+                const barColor =
+                  z.flood_risk_score >= 70
+                    ? 'bg-red-500'
+                    : z.flood_risk_score >= 50
+                    ? 'bg-amber-500'
+                    : 'bg-emerald-500';
 
                 return (
                   <div
                     key={z.zone_id}
                     onClick={() => handleMapZoneClick(z)}
-                    className={`p-3 rounded-xl border transition cursor-pointer ${
+                    className={`p-2.5 rounded-xl border transition cursor-pointer ${
                       isSelected
-                        ? 'bg-[#181d2a] border-cyan-500/60 shadow-md ring-1 ring-cyan-500/20'
-                        : isHighRisk
-                        ? 'bg-[#151722] border-amber-500/25 hover:border-amber-500/50'
-                        : 'bg-[#0d1017] border-[#1e2434] hover:border-[#2d354a]'
+                        ? 'bg-slate-100 border-slate-400 shadow-xs'
+                        : 'bg-slate-50/80 border-slate-200 hover:bg-slate-100/90'
                     }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2 min-w-0">
-                        <span className="text-[10px] font-mono font-bold text-slate-400 bg-[#1e2434] px-1.5 py-0.5 rounded">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <div className="flex items-center space-x-1.5 min-w-0">
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-200/80 text-slate-700 font-bold shrink-0">
                           Z{z.zone_id}
                         </span>
-                        <span className="text-xs font-bold text-white truncate">{z.name}</span>
+                        <span className="text-xs font-bold text-slate-900 truncate">
+                          {z.name}
+                        </span>
                       </div>
-                      <span
-                        className={`text-xs font-mono font-bold ${
-                          z.flood_risk_score >= 70
-                            ? 'text-red-400'
-                            : z.flood_risk_score >= 55
-                            ? 'text-amber-400'
-                            : 'text-slate-300'
-                        }`}
-                      >
-                        {z.flood_risk_score} <span className="text-[10px] text-slate-500 font-normal">/ 100</span>
+                      <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-md border ${riskColor}`}>
+                        {z.flood_risk_score.toFixed(1)} / 100
                       </span>
                     </div>
 
                     {/* Progress score bar */}
-                    <div className="w-full h-1.5 bg-[#1e2434] rounded-full overflow-hidden mt-2">
+                    <div className="w-full h-1.5 rounded-full bg-slate-200 overflow-hidden mb-1.5">
                       <div
-                        className={`h-full rounded-full transition-all duration-300 ${
-                          z.flood_risk_score >= 70
-                            ? 'bg-red-500'
-                            : z.flood_risk_score >= 55
-                            ? 'bg-amber-400'
-                            : 'bg-emerald-500'
-                        }`}
-                        style={{ width: `${z.flood_risk_score}%` }}
+                        className={`h-full rounded-full ${barColor}`}
+                        style={{ width: `${Math.min(100, z.flood_risk_score)}%` }}
                       />
                     </div>
 
-                    <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1.5 font-mono">
-                      <span>Pop: {z.estimated_exposed_population.toLocaleString()}</span>
+                    <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono">
+                      <span>Pop: {z.population.toLocaleString()}</span>
                       <span>Elev: {z.baseline_elevation_m}m AMSL</span>
                     </div>
                   </div>
@@ -275,111 +297,92 @@ export const CommandCentrePage: React.FC<Props> = ({
             </div>
           </div>
 
-          {/* Citizen SOS & Active Incident Queue */}
-          <div className="bg-[#11141d] border border-[#222838] rounded-2xl p-4 shadow-xl space-y-3">
-            <div className="flex items-center justify-between">
+          {/* Live Distress Calls Feed (WeCare Community Reporting Integration) */}
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs space-y-2.5">
+            <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
               <div className="flex items-center space-x-2">
-                <LifeBuoy className="w-4 h-4 text-red-400" />
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono">
-                  Live Distress Calls ({reportedIncidents.length + overview.alerts.length})
-                </h3>
+                <Phone className="w-3.5 h-3.5 text-red-600 animate-pulse" />
+                <h4 className="text-xs font-bold text-slate-900 uppercase font-mono tracking-wider">
+                  Live Distress Calls ({liveAlerts.length})
+                </h4>
               </div>
-              <span className="text-[10px] font-mono text-red-400 bg-red-950/60 px-2 py-0.5 rounded-full border border-red-800 font-bold">
+              <span className="text-[9px] font-mono text-red-700 bg-red-50 border border-red-200 px-1.5 py-0.5 rounded font-bold">
                 TNFRS LIVE
               </span>
             </div>
 
-            <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-              {reportedIncidents.map((inc) => (
+            <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
+              {liveAlerts.map((sos: any) => (
                 <div
-                  key={inc.id}
-                  className="p-2.5 rounded-xl bg-red-950/20 border border-red-500/30 text-xs space-y-1"
+                  key={sos.id}
+                  className="p-2 rounded-xl bg-slate-50 border border-slate-200/80 text-xs space-y-1"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-red-300 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-                      <span>{inc.zone_name}</span>
-                    </span>
-                    <span className="text-[9px] font-mono text-red-400 font-bold">
-                      {inc.affected_count} Stranded
+                    <span className="font-bold text-slate-900">{sos.location_name}</span>
+                    <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-50 text-amber-800 border border-amber-200 font-bold">
+                      {sos.severity}
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-300 font-medium truncate">{inc.location}</p>
-                </div>
-              ))}
-
-              {overview.alerts.map((alt) => (
-                <div
-                  key={alt.id}
-                  onClick={() => {
-                    const found = zones.find((z) => z.zone_id === alt.zone_id);
-                    if (found) handleMapZoneClick(found);
-                  }}
-                  className="p-2.5 rounded-xl bg-[#151722] border border-[#262e42] hover:border-[#384360] transition cursor-pointer text-xs space-y-1"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-white">{alt.zone_name}</span>
-                    <span className="text-[9px] font-mono text-amber-400 bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-800">
-                      {alt.severity}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-400 line-clamp-1">{alt.message}</p>
+                  <p className="text-[11px] text-slate-600 line-clamp-1">{sos.situation_details}</p>
                 </div>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Center & Right Area (8 cols): Hero Map & Deployed Assets */}
-        <div className="lg:col-span-8 space-y-5">
-          {/* Hero GIS Tactical Map */}
-          <div className="bg-[#11141d] border border-[#222838] rounded-2xl p-4 shadow-xl space-y-3">
+        {/* Center & Right Section (8 cols): Hero GIS Tactical Map & Live Allocations */}
+        <div className="lg:col-span-8 space-y-4">
+          {/* Tactical Hero Map Canvas */}
+          <div className="bg-white border border-slate-200/90 rounded-2xl p-3 sm:p-4 shadow-xs space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <h3 className="text-xs font-bold text-white uppercase tracking-wider font-mono">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <h3 className="text-xs font-bold text-slate-900 font-mono uppercase tracking-wider">
                   Chennai Arterial Network & Zone Overlay (EPSG:4326)
                 </h3>
               </div>
               <button
                 onClick={() => onNavigateTab('geospatial')}
-                className="text-xs text-slate-300 hover:text-white flex items-center space-x-1 cursor-pointer font-medium"
+                className="text-[11px] font-mono text-slate-600 hover:text-slate-900 flex items-center space-x-1 cursor-pointer font-semibold"
               >
                 <span>Expanded GIS Layers</span>
-                <ExternalLink className="w-3 h-3 text-slate-400" />
+                <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
               </button>
             </div>
 
-            <ChennaiMap
-              zones={zones}
-              roadNetwork={roadNetwork || undefined}
-              facilities={facilities || undefined}
-              selectedZoneId={selectedZone?.zone_id}
-              onSelectZone={handleMapZoneClick}
-              height="510px"
-            />
+            <div className="rounded-xl overflow-hidden border border-slate-200 shadow-2xs">
+              <ChennaiMap
+                zones={zones}
+                roadNetwork={roadNetwork || undefined}
+                facilities={facilities || undefined}
+                selectedZoneId={selectedZone?.zone_id || null}
+                onSelectZone={handleMapZoneClick}
+                height="510px"
+              />
+            </div>
           </div>
 
-          {/* Tactical Rescue Deployments (OR-Tools CBC MILP Output) */}
-          {allocations && (
-            <div className="bg-[#11141d] border border-[#222838] rounded-2xl p-4 sm:p-5 shadow-xl space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                    <Truck className="w-4 h-4" />
+          {/* Active Field Deployments List */}
+          {allocations && allocations.assignments.length > 0 && (
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-xs space-y-3">
+              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                <div className="flex items-center space-x-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
+                    <ShieldCheck className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-bold text-white">
+                    <h3 className="text-sm font-bold text-slate-900">
                       Field Rescue Deployments ({allocations.total_assigned_teams} Active Units)
                     </h3>
-                    <p className="text-[11px] text-slate-400">
+                    <p className="text-[11px] text-slate-500">
                       OR-Tools CBC solver assignments satisfying one-trip capacity & zone access
                     </p>
                   </div>
                 </div>
+
                 <button
                   onClick={() => onNavigateTab('optimisation')}
-                  className="text-xs text-slate-300 hover:text-white flex items-center space-x-1 cursor-pointer font-semibold"
+                  className="text-xs text-slate-600 hover:text-slate-900 flex items-center space-x-1 cursor-pointer font-semibold"
                 >
                   <span>Solver Formulations</span>
                   <ArrowRight className="w-3 h-3 text-slate-400" />
@@ -390,37 +393,37 @@ export const CommandCentrePage: React.FC<Props> = ({
                 {allocations.assignments.slice(0, 6).map((asg) => (
                   <div
                     key={asg.team_id}
-                    className="p-3.5 rounded-xl bg-[#0d1017] border border-[#1e2434] hover:border-[#2f3952] transition space-y-2.5 flex flex-col justify-between"
+                    className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/90 hover:border-slate-300 transition space-y-2.5 flex flex-col justify-between"
                   >
                     <div>
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                        <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
                           <span>{asg.team_name}</span>
                         </span>
-                        <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-[#181d2a] text-slate-300 border border-[#262e42] font-semibold">
+                        <span className="text-[9px] font-mono px-2 py-0.5 rounded-md bg-white text-slate-700 border border-slate-200 font-semibold shadow-2xs">
                           {asg.agency}
                         </span>
                       </div>
 
-                      <div className="text-xs text-slate-300 flex items-center justify-between py-1 border-t border-[#1a1f2c]">
-                        <span className="text-slate-400 text-[11px]">Destination:</span>
-                        <span className="font-semibold text-white truncate max-w-[140px]">
+                      <div className="text-xs text-slate-700 flex items-center justify-between py-1 border-t border-slate-200/60">
+                        <span className="text-slate-500 text-[11px]">Destination:</span>
+                        <span className="font-semibold text-slate-900 truncate max-w-[140px]">
                           Zone {asg.assigned_zone_id} ({asg.assigned_zone_name})
                         </span>
                       </div>
 
-                      <div className="text-xs text-slate-300 flex items-center justify-between py-1 border-t border-[#1a1f2c]">
-                        <span className="text-slate-400 text-[11px]">Vehicle:</span>
-                        <span className="font-mono text-cyan-400 text-[11px]">{asg.vehicle_used}</span>
+                      <div className="text-xs text-slate-700 flex items-center justify-between py-1 border-t border-slate-200/60">
+                        <span className="text-slate-500 text-[11px]">Vehicle:</span>
+                        <span className="font-mono text-indigo-700 text-[11px] font-semibold">{asg.vehicle_used}</span>
                       </div>
 
-                      <div className="text-xs text-slate-300 flex items-center justify-between py-1 border-t border-[#1a1f2c]">
-                        <span className="text-slate-400 text-[11px]">Estimated Transit:</span>
-                        <span className="font-mono text-amber-400 font-bold">{asg.estimated_arrival_time_min} mins</span>
+                      <div className="text-xs text-slate-700 flex items-center justify-between py-1 border-t border-slate-200/60">
+                        <span className="text-slate-500 text-[11px]">Estimated Transit:</span>
+                        <span className="font-mono text-amber-700 font-bold">{asg.estimated_arrival_time_min} mins</span>
                       </div>
 
-                      <div className="mt-2 p-2 rounded-lg bg-[#141824] border border-[#202738] text-[10px] text-slate-400 font-mono">
+                      <div className="mt-2 p-2 rounded-lg bg-white border border-slate-200 text-[10px] text-slate-600 font-mono shadow-2xs">
                         <div>{asg.allocated_supplies.food_packets} Meals · {asg.allocated_supplies.water_litres}L Water · {asg.allocated_supplies.medical_kits} Med</div>
                       </div>
                     </div>
@@ -431,9 +434,9 @@ export const CommandCentrePage: React.FC<Props> = ({
                         if (targetZone) onSelectZone(targetZone);
                         onNavigateTab('routing');
                       }}
-                      className="w-full mt-2 py-1.5 bg-[#181d2a] hover:bg-[#22293b] text-slate-200 hover:text-white border border-[#2a3348] rounded-lg text-xs font-semibold transition cursor-pointer flex items-center justify-center space-x-1"
+                      className="w-full mt-2 py-1.5 bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center justify-center space-x-1 shadow-2xs"
                     >
-                      <Navigation className="w-3 h-3" />
+                      <Navigation className="w-3 h-3 text-slate-600" />
                       <span>Inspect Route</span>
                     </button>
                   </div>

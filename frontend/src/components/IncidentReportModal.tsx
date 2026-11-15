@@ -41,11 +41,11 @@ export const IncidentReportModal: React.FC<Props> = ({
   if (!isOpen) return null;
 
   const categories = [
-    { id: 'inundation', label: 'Severe Inundation', icon: Droplets, color: 'text-cyan-400 border-cyan-800 bg-cyan-950/40' },
-    { id: 'stranded', label: 'Stranded Citizens', icon: LifeBuoy, color: 'text-amber-400 border-amber-800 bg-amber-950/40' },
-    { id: 'medical', label: 'Medical Distress', icon: HeartPulse, color: 'text-rose-400 border-rose-800 bg-rose-950/40' },
-    { id: 'road_cut', label: 'Road / Bridge Cut', icon: Ban, color: 'text-red-400 border-red-800 bg-red-950/40' },
-    { id: 'grid_fail', label: 'Substation Hazard', icon: Zap, color: 'text-yellow-400 border-yellow-800 bg-yellow-950/40' },
+    { id: 'inundation', label: 'Severe Inundation', icon: Droplets, color: 'text-sky-700 border-sky-200 bg-sky-50' },
+    { id: 'stranded', label: 'Stranded Citizens', icon: LifeBuoy, color: 'text-amber-700 border-amber-200 bg-amber-50' },
+    { id: 'medical', label: 'Medical Distress', icon: HeartPulse, color: 'text-rose-700 border-rose-200 bg-rose-50' },
+    { id: 'road_cut', label: 'Road / Bridge Cut', icon: Ban, color: 'text-red-700 border-red-200 bg-red-50' },
+    { id: 'grid_fail', label: 'Substation Hazard', icon: Zap, color: 'text-amber-800 border-amber-200 bg-amber-50' },
   ];
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -75,26 +75,26 @@ export const IncidentReportModal: React.FC<Props> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-      <div className="relative w-full max-w-lg bg-[#0e1726] border border-cyan-800/60 rounded-2xl shadow-2xl shadow-cyan-950/50 overflow-hidden text-slate-100">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden text-slate-900">
         {/* Modal Header */}
-        <div className="px-6 py-4 bg-gradient-to-r from-slate-900 via-[#0e1726] to-cyan-950/50 border-b border-slate-800 flex items-center justify-between">
+        <div className="px-6 py-4 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400">
+            <div className="w-9 h-9 rounded-xl bg-red-100 border border-red-200 flex items-center justify-center text-red-600">
               <AlertTriangle className="w-5 h-5 animate-pulse" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-white tracking-tight flex items-center gap-2">
+              <h3 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
                 Citizen SOS & Field Incident Dispatch
               </h3>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-slate-500">
                 Direct relay to GCC Command Centre & TNFRS Dispatch Grid
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -102,11 +102,11 @@ export const IncidentReportModal: React.FC<Props> = ({
 
         {isSubmitted ? (
           <div className="p-8 text-center space-y-3">
-            <div className="w-14 h-14 mx-auto rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 animate-bounce">
+            <div className="w-14 h-14 mx-auto rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-600 animate-bounce">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h4 className="text-lg font-bold text-white">Incident Broadcasted to Command Grid</h4>
-            <p className="text-xs text-slate-400">
+            <h4 className="text-lg font-bold text-slate-900">Incident Broadcasted to Command Grid</h4>
+            <p className="text-xs text-slate-600">
               Assigned rescue units and nearest staging depots have received coordinates.
             </p>
           </div>
@@ -114,7 +114,7 @@ export const IncidentReportModal: React.FC<Props> = ({
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             {/* Category Selector */}
             <div>
-              <label className="block text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-2">
+              <label className="block text-[11px] font-mono text-slate-600 uppercase tracking-wider mb-2 font-bold">
                 Incident Classification
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -126,10 +126,10 @@ export const IncidentReportModal: React.FC<Props> = ({
                       type="button"
                       key={cat.id}
                       onClick={() => setCategory(cat.id)}
-                      className={`flex items-center space-x-2 p-2.5 rounded-xl border text-left text-xs font-medium transition cursor-pointer ${
+                      className={`flex items-center space-x-2 p-2.5 rounded-xl border text-left text-xs font-semibold transition cursor-pointer ${
                         isSelected
-                          ? `${cat.color} border-current shadow-md shadow-cyan-950/40 scale-[1.02]`
-                          : 'bg-slate-900/60 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                          ? `${cat.color} border-current shadow-xs scale-[1.02]`
+                          : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                       }`}
                     >
                       <Icon className="w-4 h-4 shrink-0" />
@@ -143,14 +143,14 @@ export const IncidentReportModal: React.FC<Props> = ({
             {/* Zone & Location Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                  <MapPin className="w-3.5 h-3.5 text-cyan-400" />
+                <label className="block text-[11px] font-mono text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1 font-bold">
+                  <MapPin className="w-3.5 h-3.5 text-indigo-600" />
                   <span>Target GCC Zone</span>
                 </label>
                 <select
                   value={selectedZone}
                   onChange={(e) => setSelectedZone(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 cursor-pointer"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:border-slate-800 cursor-pointer font-medium"
                 >
                   {availableZones.map((z) => (
                     <option key={z.zone_id} value={z.zone_id}>
@@ -161,7 +161,7 @@ export const IncidentReportModal: React.FC<Props> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-mono text-slate-600 uppercase tracking-wider mb-1.5 font-bold">
                   Specific Landmark / Street
                 </label>
                 <input
@@ -169,7 +169,7 @@ export const IncidentReportModal: React.FC<Props> = ({
                   placeholder="e.g. 100ft Road / Near Metro Station"
                   value={locationName}
                   onChange={(e) => setLocationName(e.target.value)}
-                  className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500"
+                  className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-800 font-medium"
                 />
               </div>
             </div>
@@ -177,7 +177,7 @@ export const IncidentReportModal: React.FC<Props> = ({
             {/* Urgency & Affected Persons */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1.5">
+                <label className="block text-[11px] font-mono text-slate-600 uppercase tracking-wider mb-1.5 font-bold">
                   Severity Tier
                 </label>
                 <div className="grid grid-cols-3 gap-1.5">
@@ -189,11 +189,11 @@ export const IncidentReportModal: React.FC<Props> = ({
                       className={`py-1.5 px-2 rounded-lg text-[10px] font-bold font-mono tracking-wider border cursor-pointer transition ${
                         severity === lvl
                           ? lvl === 'CRITICAL'
-                            ? 'bg-red-500/20 border-red-500 text-red-400'
+                            ? 'bg-red-600 border-red-700 text-white'
                             : lvl === 'SEVERE'
-                            ? 'bg-amber-500/20 border-amber-500 text-amber-400'
-                            : 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
-                          : 'bg-slate-900 border-slate-800 text-slate-500 hover:text-slate-300'
+                            ? 'bg-amber-600 border-amber-700 text-white'
+                            : 'bg-emerald-600 border-emerald-700 text-white'
+                          : 'bg-slate-100 border-slate-200 text-slate-600 hover:text-slate-900'
                       }`}
                     >
                       {lvl}
@@ -203,8 +203,8 @@ export const IncidentReportModal: React.FC<Props> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1.5 flex items-center gap-1">
-                  <Users className="w-3.5 h-3.5 text-cyan-400" />
+                <label className="block text-[11px] font-mono text-slate-600 uppercase tracking-wider mb-1.5 flex items-center gap-1 font-bold">
+                  <Users className="w-3.5 h-3.5 text-indigo-600" />
                   <span>Est. Stranded People ({affectedCount})</span>
                 </label>
                 <input
@@ -213,29 +213,29 @@ export const IncidentReportModal: React.FC<Props> = ({
                   max="200"
                   value={affectedCount}
                   onChange={(e) => setAffectedCount(Number(e.target.value))}
-                  className="w-full accent-cyan-400 cursor-pointer"
+                  className="w-full accent-slate-800 cursor-pointer"
                 />
               </div>
             </div>
 
             {/* Special Needs Toggles */}
             <div className="flex flex-wrap gap-4 pt-1">
-              <label className="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer">
+              <label className="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer font-medium">
                 <input
                   type="checkbox"
                   checked={needBoat}
                   onChange={(e) => setNeedBoat(e.target.checked)}
-                  className="rounded border-slate-700 bg-slate-900 text-cyan-500 focus:ring-0 w-4 h-4"
+                  className="rounded border-slate-300 text-slate-900 focus:ring-0 w-4 h-4"
                 />
                 <span>Boat Rescue Essential (Water &gt; 1.0m)</span>
               </label>
 
-              <label className="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer">
+              <label className="flex items-center space-x-2 text-xs text-slate-700 cursor-pointer font-medium">
                 <input
                   type="checkbox"
                   checked={needMedical}
                   onChange={(e) => setNeedMedical(e.target.checked)}
-                  className="rounded border-slate-700 bg-slate-900 text-rose-500 focus:ring-0 w-4 h-4"
+                  className="rounded border-slate-300 text-red-600 focus:ring-0 w-4 h-4"
                 />
                 <span>Critical Medical Patient Present</span>
               </label>
@@ -243,7 +243,7 @@ export const IncidentReportModal: React.FC<Props> = ({
 
             {/* Notes */}
             <div>
-              <label className="block text-[11px] font-mono text-slate-400 uppercase tracking-wider mb-1.5">
+              <label className="block text-[11px] font-mono text-slate-600 uppercase tracking-wider mb-1.5 font-bold">
                 Field Notes / Accessibility Hazards
               </label>
               <textarea
@@ -251,7 +251,7 @@ export const IncidentReportModal: React.FC<Props> = ({
                 placeholder="e.g. Ground floor inundated, 4 elderly citizens on first-floor balcony..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 resize-none"
+                className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-slate-800 resize-none font-medium"
               />
             </div>
 
@@ -260,13 +260,13 @@ export const IncidentReportModal: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-medium cursor-pointer transition"
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold cursor-pointer transition"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 bg-gradient-to-r from-red-600 via-rose-600 to-amber-600 hover:from-red-500 hover:to-amber-500 text-white font-bold rounded-xl text-xs shadow-lg shadow-red-900/40 flex items-center space-x-2 cursor-pointer transition transform active:scale-95"
+                className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl text-xs shadow-sm flex items-center space-x-2 cursor-pointer transition transform active:scale-95"
               >
                 <Send className="w-3.5 h-3.5" />
                 <span>Transmit SOS Incident</span>
