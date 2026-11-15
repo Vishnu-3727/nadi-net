@@ -1,4 +1,4 @@
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 from pydantic import BaseModel, Field
 
 class RescueTeamSchema(BaseModel):
@@ -28,6 +28,24 @@ class ResourceStockSchema(BaseModel):
     allocated_boats: int = 0
     provenance: str = "SIMULATED"
 
+class ShelterAssignment(BaseModel):
+    shelter_id: str
+    shelter_name: str
+    zone_id: int
+    zone_name: str
+    evacuees_assigned: int
+    shelter_capacity: int
+    shelter_remaining_capacity: int
+
+class ZoneEvacuationStatus(BaseModel):
+    zone_id: int
+    zone_name: str
+    priority: int
+    demand_persons: int
+    served_persons: int
+    unmet_persons: int
+    is_fully_served: bool
+
 class TeamAssignment(BaseModel):
     team_id: str
     team_name: str
@@ -43,6 +61,7 @@ class TeamAssignment(BaseModel):
     allocated_supplies: Dict[str, int]
     route_nodes: List[str]
     assignment_justification: str
+    evacuees_transported: int = 0
 
 class UnmetDestination(BaseModel):
     zone_id: int
@@ -51,9 +70,10 @@ class UnmetDestination(BaseModel):
     risk_score: float
     estimated_exposed_population: int
     deficit_reason: str
+    unmet_demand_persons: int = 0
 
 class OptimisationResult(BaseModel):
-    status: str  # "OPTIMAL", "FEASIBLE", "INFEASIBLE"
+    status: str  # "OPTIMAL", "FEASIBLE", "INFEASIBLE", "NO_MIP_SOLVER", "ABNORMAL"
     solver_used: str = "Google_OR_Tools_CBC_MILP"
     total_assigned_teams: int
     total_unassigned_teams: int
@@ -65,3 +85,10 @@ class OptimisationResult(BaseModel):
     remaining_stock: ResourceStockSchema
     provenance: str = "MODEL_ESTIMATE"
     execution_time_ms: float
+    # V2 Mathematical Allocator Extensions (backward compatible with defaults)
+    shelter_assignments: List[ShelterAssignment] = []
+    zone_evacuation_statuses: List[ZoneEvacuationStatus] = []
+    total_demand_persons: int = 0
+    total_served_persons: int = 0
+    total_unmet_persons: int = 0
+    solver_diagnostics: Optional[str] = None

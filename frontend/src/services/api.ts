@@ -94,4 +94,39 @@ export const api = {
   // History
   getHistory: () => fetchJson<{ total: number; runs: HistoryRunItem[] }>('/history'),
   getHistoryDetail: (runId: string) => fetchJson<any>(`/history/${runId}`),
+
+  // Waterways & Multi-modal Routing
+  getWaterways: () => fetchJson<any>('/map/waterways'),
+  computeMultiModalRoute: (payload: {
+    origin_node_id: string;
+    destination_node_id: string;
+    primary_vehicle_type?: string;
+    watercraft_type?: string;
+    allow_waterway?: boolean;
+    blocked_edges?: string[];
+  }) =>
+    fetchJson<any>('/routing/multimodal', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  // Dynamic Replanning & Critical Links
+  replanAllocations: (payload: {
+    scenario_id?: string;
+    events: any[];
+    active_assignments?: any[];
+    completed_team_ids?: string[];
+    evacuated_persons_count?: number;
+  }) =>
+    fetchJson<any>('/allocations/replan', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  getCriticalLinks: (scenarioId?: string, blockedEdges?: string) => {
+    const params = new URLSearchParams();
+    if (scenarioId) params.append('scenario_id', scenarioId);
+    if (blockedEdges) params.append('blocked_edges', blockedEdges);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return fetchJson<any>(`/infrastructure/critical-links${query}`);
+  },
 };

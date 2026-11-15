@@ -135,8 +135,10 @@ export const RescueRoutingPage: React.FC<Props> = ({ roadNetwork, activeBlockedE
                 className="w-full bg-slate-900 border border-slate-700 text-white p-2 rounded-lg font-mono focus:border-cyan-500"
               >
                 <option value="NORMAL_RESCUE">Normal Rescue Vehicle (Cannot traverse flooded roads)</option>
-                <option value="HIGH_CLEARANCE">High-Clearance Heavy Truck (Wades moderate water)</option>
-                <option value="AMPHIBIOUS_BOAT">Amphibious Motorboat (Navigates submerged corridors)</option>
+                <option value="AMBULANCE_STANDARD">Standard Ambulance (0.20m wading limit, avoids underpasses)</option>
+                <option value="RESCUE_4WD">4WD High-Clearance Rescue (0.45m wading limit)</option>
+                <option value="HEAVY_CLEARANCE">Heavy Tactical Truck (0.90m wading limit)</option>
+                <option value="AMPHIBIOUS_CRAFT">Amphibious All-Terrain Vehicle (Land & Water capability)</option>
               </select>
             </div>
 

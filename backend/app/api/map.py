@@ -25,3 +25,8 @@ def get_map_facilities(db: Session = Depends(get_db)):
     if not state:
         state = simulator_service.run_simulation(db, scenario_id="SCN-A")
     return state.get("facilities", geo_service.get_facilities())
+
+@router.get("/waterways")
+def get_map_waterways():
+    from backend.app.services.routing.waterway_network import waterway_manager
+    return waterway_manager.get_network_schema()

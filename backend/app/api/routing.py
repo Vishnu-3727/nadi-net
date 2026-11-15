@@ -23,3 +23,22 @@ def calculate_route(req: RouteRequest, db: Session = Depends(get_db)):
 @router.post("/alternatives", response_model=RouteResponse)
 def calculate_alternatives(req: RouteRequest, db: Session = Depends(get_db)):
     return calculate_route(req, db)
+
+@router.post("/multimodal")
+def calculate_multimodal_route(req_dict: dict, db: Session = Depends(get_db)):
+    from backend.app.schemas.waterways import MultiModalRouteRequest
+    from backend.app.services.routing.multimodal_router import multimodal_router
+
+    state = simulator_service.active_state_cache
+    if not state:
+        state = simulator_service.run_simulation(db, scenario_id="SCN-A")
+
+    blocked = state.get("blocked_edge_ids", [])
+    if "blocked_edges" not in req_dict or req_dict["blocked_edges"] is None:
+        req_dict["blocked_edges"] = blocked
+
+    try:
+        parsed_req = MultiModalRouteRequest(**req_dict)
+        return multimodal_router.compute_route(parsed_req)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))

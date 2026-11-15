@@ -65,9 +65,63 @@ NADI-NET bridges this gap by unifying explainable multi-criteria risk intelligen
   - **Scenario C:** Critical Multi-Basin Emergency (430 mm deluge, major severance, 4 teams).
 - Live parameter sliders propagating state changes deterministically across all modules without server restart.
 
+### 7. v2 Additions
+- **Flood-depth scenario engine** (`flood_depth_engine.py`): turns rainfall, tidal surge and blocked edges into per-road `[min, expected, max]` depth ranges. Transparent scenario assumptions, not a hydrodynamic forecast.
+- **Vehicle accessibility** (`vehicle_accessibility.py`): each vehicle has a wading-depth limit, flow-velocity limit and banned structures (e.g. underpasses). A road is passable per vehicle, not just per scenario.
+- **Multi-modal routing** (`multimodal_router.py`): road graph plus a synthetic waterway graph. Boats cannot use dry roads, trucks cannot enter water, and mode switches happen only at boat launch hubs.
+- **Critical-link restoration ranking** (`link_ranker.py`): ranks blocked roads by how much population, hospital and shelter access is regained if crews reopen them.
+- **Dynamic replanning** (`replanner.py`, `POST /allocations/replan`): injects events (road collapse, vehicle breakdown, shelter closure) and re-solves the MILP with minimal disruption, keeping completed missions intact.
+
 ---
 
-## 3. Data Provenance & Scientific Integrity
+## 3. How It Works
+
+```
+ Scenario inputs (rain mm, tide, blocked roads, team count)
+            │
+            ▼
+ ┌──────────────────────┐   ┌─────────────────────────┐
+ │ 1. Flood Intelligence │   │ 2. Flood depth per road │
+ │  MCDA score per zone  │   │  min / expected / max   │
+ └──────────┬───────────┘   └────────────┬────────────┘
+            │ risk + priority            │ passable? per vehicle
+            ▼                            ▼
+        ┌─────────────────────────────────────┐
+        │ 3. Routing: NetworkX Dijkstra + Yen │
+        │    road graph (+ water graph)       │
+        └──────────────────┬──────────────────┘
+                           │ travel times, reachability
+                           ▼
+        ┌─────────────────────────────────────┐
+        │ 4. Allocation: OR-Tools CBC MILP    │
+        │    teams → zones, supplies → zones  │
+        └──────────────────┬──────────────────┘
+                           ▼
+        FastAPI  ──►  SQLite log  ──►  React command centre
+```
+
+1. **Score risk.** For each of the 15 zones, six factors (rainfall, elevation, flood history, drainage, water level, social vulnerability) are normalised to 0-1 and combined with AHP weights into a 0-100 score. Every factor's contribution is reported, so a planner sees why a zone is critical. Missing inputs are imputed and lower a confidence value instead of being hidden.
+2. **Estimate road conditions.** The scenario sets a depth range on each road segment. A vehicle profile (ambulance, 4WD, high-clearance truck, amphibious boat) decides whether that depth is passable.
+3. **Route around damage.** Edges that are blocked or too deep for the vehicle get a severance penalty or are removed. Dijkstra finds the fastest path. If a bridge is submerged, Yen's k-shortest-paths returns detours. A destination with no path is reported as unreachable, never guessed.
+4. **Allocate scarce resources.** A mixed-integer program assigns each rescue team to at most one zone and splits relief stock. It maximises covered high-priority population and minimises transit time. A penalty variable per zone makes leaving a critical zone unserved very expensive. Zones that still go unserved get an explicit deficit reason (no team, no stock, unreachable).
+5. **Replan when things change.** New events re-run steps 3-4 with finished missions locked, so the plan changes as little as possible.
+6. **Show it.** FastAPI serves results from the active scenario cache. Changing a slider re-runs the whole chain. Runs are logged to SQLite and survive restarts. The React UI (Leaflet dark map, 8 tabs) renders backend state only, with a provenance badge on every figure.
+
+### Where each step lives
+
+| Step | Code |
+|---|---|
+| Risk scoring | `backend/app/services/flood_intelligence/risk_engine.py` |
+| Flood depth | `backend/app/services/flood_intelligence/flood_depth_engine.py` |
+| Vehicle rules | `backend/app/services/routing/vehicle_accessibility.py` |
+| Routing | `backend/app/services/routing/rescue_router.py`, `multimodal_router.py` |
+| Allocation | `backend/app/services/resource_optimisation/allocator.py` |
+| Replanning, link ranking | `replanner.py`, `link_ranker.py` (same folder as allocator) |
+| Scenario orchestration | `backend/app/services/scenario_simulation/simulator.py` |
+
+---
+
+## 4. Data Provenance & Scientific Integrity
 
 NADI-NET explicitly labels every data point with its provenance class:
 - **OBSERVED:** Physical entities (Chennai hospitals, beds, road nodes, SRTM elevation).
@@ -77,7 +131,7 @@ NADI-NET explicitly labels every data point with its provenance class:
 
 ---
 
-## 4. Quick Start & Installation
+## 5. Quick Start & Installation
 
 ### Prerequisites
 - Python 3.10+ (tested on Python 3.11, 3.12, 3.13)
@@ -86,7 +140,7 @@ NADI-NET explicitly labels every data point with its provenance class:
 
 ### 1. Clone & Setup Workspace
 ```bash
-git clone https://github.com/your-org/nadi-net.git
+git clone https://github.com/Vishnu-3727/nadi-net.git
 cd nadi-net
 ```
 
@@ -114,7 +168,7 @@ Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
-## 5. Automated Verification & Testing
+## 6. Automated Verification & Testing
 
 Run the automated backend test suite:
 ```bash
@@ -128,7 +182,7 @@ python -m pytest backend/tests -v
 
 ---
 
-## 6. Project Architecture
+## 7. Project Architecture
 
 ```
 nadi-net/
@@ -183,7 +237,7 @@ nadi-net/
 
 ---
 
-## 7. License & Credits
+## 8. License & Credits
 
 Developed under the **MIT License**.  
 Participating in **K! Hacks 4.0 — CEG Tech Forum, Anna University, Chennai**.

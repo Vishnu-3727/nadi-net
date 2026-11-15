@@ -4,6 +4,11 @@ from typing import List, Dict, Any, Optional, Tuple
 import networkx as nx
 
 from backend.app.core.config import settings
+from backend.app.schemas.flood_depth import RoadFloodCondition, EdgeAccessibilityResult
+from backend.app.services.routing.vehicle_accessibility import (
+    evaluate_edge_accessibility,
+    get_vehicle_profile,
+)
 from backend.app.schemas.routing import (
     RouteRequest,
     RouteResponse,
@@ -67,7 +72,8 @@ class FloodAwareRescueRouter:
     def compute_route(
         self,
         request: RouteRequest,
-        active_blocked_edges: Optional[List[str]] = None
+        active_blocked_edges: Optional[List[str]] = None,
+        flood_conditions: Optional[Dict[str, RoadFloodCondition]] = None,
     ) -> RouteResponse:
         u = request.origin_node_id
         v = request.destination_node_id
@@ -85,36 +91,62 @@ class FloodAwareRescueRouter:
             G.add_node(node_id, **data)
 
         encountered_blocked_segments = []
+        rejected_reasons: List[str] = []
 
         for u_edge, v_edge, data in self.base_graph.edges(data=True):
             edge_id = data["id"]
-            is_blocked = edge_id in blocked
-
-            # Compute effective cost
             base_time = data["base_time_min"]
             susceptibility = data["flood_susceptibility"]
 
-            if is_blocked:
-                encountered_blocked_segments.append(edge_id)
-                if request.vehicle_type == "AMPHIBIOUS_BOAT":
-                    # Boat can cross flooded corridors at lower speed
-                    cost = (data["distance_km"] / 15.0) * 60.0 * 1.5
-                    G.add_edge(u_edge, v_edge, cost=cost, edge_id=edge_id, is_blocked=True, **data)
-                elif request.vehicle_type == "HIGH_CLEARANCE" and susceptibility < 0.8:
-                    # High clearance can wade through moderate water with 3x penalty
-                    cost = base_time * 3.5
-                    G.add_edge(u_edge, v_edge, cost=cost, edge_id=edge_id, is_blocked=True, **data)
-                else:
-                    # Standard rescue vehicles cannot pass blocked edges
+            # Phase 3.2: If fine-grained flood conditions are provided, evaluate physical accessibility
+            if flood_conditions is not None:
+                cond = flood_conditions.get(edge_id)
+                eval_res = evaluate_edge_accessibility(
+                    edge=data,
+                    vehicle=request.vehicle_type,
+                    flood_condition=cond,
+                    conservative_unknown=request.conservative_unknown,
+                )
+
+                if eval_res.status in ("BLOCKED", "UNKNOWN"):
+                    encountered_blocked_segments.append(edge_id)
+                    rejected_reasons.append(f"Edge {edge_id} ({data.get('name', 'Segment')}): {eval_res.reason}")
                     continue
+                elif eval_res.status == "RESTRICTED":
+                    cost = base_time * eval_res.cost_multiplier
+                    G.add_edge(u_edge, v_edge, cost=cost, edge_id=edge_id, is_blocked=False, accessibility=eval_res.model_dump(), **data)
+                else:  # PASSABLE
+                    risk_penalty = 1.0 + (0.3 * susceptibility)
+                    cost = base_time * risk_penalty * eval_res.cost_multiplier
+                    G.add_edge(u_edge, v_edge, cost=cost, edge_id=edge_id, is_blocked=False, accessibility=eval_res.model_dump(), **data)
             else:
-                # Normal road with mild flood-risk slowdown penalty
-                risk_penalty = 1.0 + (0.3 * susceptibility)
-                cost = base_time * risk_penalty
-                G.add_edge(u_edge, v_edge, cost=cost, edge_id=edge_id, is_blocked=False, **data)
+                # Legacy binary blockage handling
+                is_blocked = edge_id in blocked
+                if is_blocked:
+                    encountered_blocked_segments.append(edge_id)
+                    if request.vehicle_type in ("AMPHIBIOUS_BOAT", "AMPHIBIOUS_CRAFT"):
+                        # Boat / amphibious craft can cross flooded corridors at lower speed
+                        cost = (data["distance_km"] / 15.0) * 60.0 * 1.5
+                        G.add_edge(u_edge, v_edge, cost=cost, edge_id=edge_id, is_blocked=True, **data)
+                    elif request.vehicle_type in ("HIGH_CLEARANCE", "HEAVY_CLEARANCE_TRUCK") and susceptibility < 0.8:
+                        # High clearance can wade through moderate water with 3.5x penalty
+                        cost = base_time * 3.5
+                        G.add_edge(u_edge, v_edge, cost=cost, edge_id=edge_id, is_blocked=True, **data)
+                    else:
+                        # Standard rescue vehicles cannot pass blocked edges
+                        continue
+                else:
+                    # Normal road with mild flood-risk slowdown penalty
+                    risk_penalty = 1.0 + (0.3 * susceptibility)
+                    cost = base_time * risk_penalty
+                    G.add_edge(u_edge, v_edge, cost=cost, edge_id=edge_id, is_blocked=False, **data)
 
         # Check reachability
         if not nx.has_path(G, u, v):
+            v_name = self.nodes_dict[v]["name"]
+            rationale = "No feasible traversable path exists due to complete flood severance."
+            if flood_conditions is not None:
+                rationale = f"All connecting corridors exceed {request.vehicle_type} physical operating limits or structural restrictions."
             return RouteResponse(
                 origin_node_id=u,
                 destination_node_id=v,
@@ -125,12 +157,13 @@ class FloodAwareRescueRouter:
                     nodes=[],
                     edges=[],
                     blocked_segments_encountered=list(set(encountered_blocked_segments)),
-                    selection_rationale="No feasible traversable path exists due to complete flood severance.",
-                    vehicle_compatibility="Incompatible - Road corridor completely impassable for selected vehicle type.",
+                    selection_rationale=rationale,
+                    vehicle_compatibility=f"Incompatible - Road corridor completely impassable for {request.vehicle_type}.",
                     provenance="MODEL_ESTIMATE",
                 ),
                 alternatives=[],
-                unreachable_reason=f"Destination node {v} ({self.nodes_dict[v]['name']}) is isolated. Arterial connections blocked by active flood inundation."
+                unreachable_reason=f"Destination node {v} ({v_name}) is isolated. Arterial connections blocked by active flood inundation or vehicle depth limit.",
+                rejected_alternatives_reasons=rejected_reasons[:5],
             )
 
         # Compute primary route via Dijkstra
@@ -167,7 +200,8 @@ class FloodAwareRescueRouter:
             destination_node_id=v,
             primary_route=primary_detail,
             alternatives=alternatives,
-            unreachable_reason=None
+            unreachable_reason=None,
+            rejected_alternatives_reasons=rejected_reasons[:5],
         )
 
     def _extract_route_detail(

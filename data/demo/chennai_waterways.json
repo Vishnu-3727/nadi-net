@@ -1,0 +1,163 @@
+{
+  "metadata": {
+    "dataset_name": "Chennai Synthetic Waterway Network & Boat Deployment Hubs",
+    "crs": "EPSG:4326",
+    "retrieval_date": "2024-11-01",
+    "data_license": "Demonstration Dataset - Not for real navigation",
+    "source_attribution": "Synthetic demonstration dataset created for NADI-NET V2 based on historical flood channel traces (Adyar River Reach & Buckingham Canal Segment)",
+    "is_simulated": true,
+    "provenance": "SYNTHETIC_DEMO",
+    "warning": "Demonstration data only. Not surveyed hydrographic sounding data. Never use for real maritime or rescue navigation."
+  },
+  "nodes": [
+    {
+      "id": "W01",
+      "name": "Saidapet Causeway Water Access",
+      "lat": 13.0225,
+      "lon": 80.2225,
+      "waterway": "Adyar River",
+      "node_type": "BOAT_LAUNCH_RAMP",
+      "road_node_transfer_id": "N15",
+      "transfer_time_min": 10.0,
+      "status": "OPERATIONAL",
+      "is_simulated": true
+    },
+    {
+      "id": "W02",
+      "name": "Kotturpuram River Bend",
+      "lat": 13.0180,
+      "lon": 80.2380,
+      "waterway": "Adyar River",
+      "node_type": "WATER_INTERSECTION",
+      "road_node_transfer_id": null,
+      "transfer_time_min": 0.0,
+      "status": "OPERATIONAL",
+      "is_simulated": true
+    },
+    {
+      "id": "W03",
+      "name": "Adyar Malar Launch Hub",
+      "lat": 13.0065,
+      "lon": 80.2565,
+      "waterway": "Adyar River",
+      "node_type": "BOAT_LAUNCH_RAMP",
+      "road_node_transfer_id": "N18",
+      "transfer_time_min": 8.0,
+      "status": "OPERATIONAL",
+      "is_simulated": true
+    },
+    {
+      "id": "W04",
+      "name": "Adyar Estuary / Broken Bridge Reach",
+      "lat": 13.0120,
+      "lon": 80.2720,
+      "waterway": "Adyar River",
+      "node_type": "WATER_INTERSECTION",
+      "road_node_transfer_id": null,
+      "transfer_time_min": 0.0,
+      "status": "OPERATIONAL",
+      "is_simulated": true
+    },
+    {
+      "id": "W05",
+      "name": "Buckingham Canal Thiruvanmiyur Slipway",
+      "lat": 12.9835,
+      "lon": 80.2585,
+      "waterway": "Buckingham Canal",
+      "node_type": "BOAT_LAUNCH_RAMP",
+      "road_node_transfer_id": "N19",
+      "transfer_time_min": 12.0,
+      "status": "OPERATIONAL",
+      "is_simulated": true
+    },
+    {
+      "id": "W06",
+      "name": "Perungudi Marsh Waterway Landing",
+      "lat": 12.9655,
+      "lon": 80.2435,
+      "waterway": "Buckingham Canal",
+      "node_type": "RECOVERY_POINT",
+      "road_node_transfer_id": "N20",
+      "transfer_time_min": 10.0,
+      "status": "OPERATIONAL",
+      "is_simulated": true
+    }
+  ],
+  "edges": [
+    {
+      "id": "WE01",
+      "u": "W01",
+      "v": "W02",
+      "name": "Adyar Upper Channel (Saidapet to Kotturpuram)",
+      "waterway": "Adyar River",
+      "distance_km": 2.2,
+      "speed_limit_kmh": 15.0,
+      "min_required_depth_m": 0.40,
+      "max_permitted_current_mps": 2.2,
+      "current_depth_m": 1.20,
+      "current_flow_velocity_mps": 1.10,
+      "navigation_status": "OPERATIONAL",
+      "is_simulated": true
+    },
+    {
+      "id": "WE02",
+      "u": "W02",
+      "v": "W03",
+      "name": "Adyar Mid Channel (Kotturpuram to Malar)",
+      "waterway": "Adyar River",
+      "distance_km": 2.6,
+      "speed_limit_kmh": 15.0,
+      "min_required_depth_m": 0.45,
+      "max_permitted_current_mps": 2.0,
+      "current_depth_m": 1.40,
+      "current_flow_velocity_mps": 1.20,
+      "navigation_status": "OPERATIONAL",
+      "is_simulated": true
+    },
+    {
+      "id": "WE03",
+      "u": "W03",
+      "v": "W04",
+      "name": "Adyar Lower Estuary (Malar to Estuary)",
+      "waterway": "Adyar River",
+      "distance_km": 2.1,
+      "speed_limit_kmh": 18.0,
+      "min_required_depth_m": 0.50,
+      "max_permitted_current_mps": 2.5,
+      "current_depth_m": 1.80,
+      "current_flow_velocity_mps": 0.90,
+      "navigation_status": "OPERATIONAL",
+      "is_simulated": true
+    },
+    {
+      "id": "WE04",
+      "u": "W03",
+      "v": "W05",
+      "name": "Buckingham Canal Reach 1 (Adyar to Thiruvanmiyur)",
+      "waterway": "Buckingham Canal",
+      "distance_km": 3.1,
+      "speed_limit_kmh": 12.0,
+      "min_required_depth_m": 0.35,
+      "max_permitted_current_mps": 1.8,
+      "current_depth_m": 0.85,
+      "current_flow_velocity_mps": 0.70,
+      "navigation_status": "OPERATIONAL",
+      "is_simulated": true
+    },
+    {
+      "id": "WE05",
+      "u": "W05",
+      "v": "W06",
+      "name": "Buckingham Canal Reach 2 (Thiruvanmiyur to Perungudi)",
+      "waterway": "Buckingham Canal",
+      "distance_km": 2.8,
+      "speed_limit_kmh": 12.0,
+      "min_required_depth_m": 0.35,
+      "max_permitted_current_mps": 1.8,
+      "current_depth_m": 0.75,
+      "current_flow_velocity_mps": 0.65,
+      "navigation_status": "OPERATIONAL",
+      "is_simulated": true
+    }
+  ]
+}
