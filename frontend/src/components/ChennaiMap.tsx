@@ -321,66 +321,66 @@ export const ChennaiMap: React.FC<Props> = ({
   };
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl bg-[#07090e] ring-1 ring-white/5">
+    <div className="relative w-full rounded-2xl overflow-hidden border border-zinc-800 shadow-md bg-[#09090b]">
       <div ref={mapContainerRef} style={{ height }} className="z-10" />
 
-      {/* Floating Layer Controls (WeCare Style Glass Island) */}
-      <div className="absolute top-3.5 right-3.5 z-[1000] flex flex-wrap items-center gap-1.5 bg-[#0e121b]/85 backdrop-blur-xl p-1.5 rounded-xl border border-white/[0.1] shadow-2xl">
+      {/* Floating Layer Controls */}
+      <div className="absolute top-3.5 right-3.5 z-[1000] flex flex-wrap items-center gap-1.5 bg-zinc-900/90 backdrop-blur-md p-1.5 rounded-xl border border-zinc-800 shadow-lg">
         <button
           onClick={() => setShowZones(!showZones)}
-          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition cursor-pointer ${
+          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition cursor-pointer ${
             showZones
-              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm'
-              : 'text-slate-400 hover:text-white bg-white/[0.03] border border-transparent'
+              ? 'bg-zinc-700 text-white border border-zinc-600 shadow-sm'
+              : 'text-zinc-400 hover:text-white bg-transparent border border-transparent'
           }`}
           title="Toggle 15 GCC Zones"
         >
-          <MapPin className="w-3 h-3" />
+          <MapPin className="w-3 h-3 text-amber-400" />
           <span>Zones</span>
         </button>
 
         <button
           onClick={() => setShowRoads(!showRoads)}
-          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition cursor-pointer ${
+          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition cursor-pointer ${
             showRoads
-              ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm'
-              : 'text-slate-400 hover:text-white bg-white/[0.03] border border-transparent'
+              ? 'bg-zinc-700 text-white border border-zinc-600 shadow-sm'
+              : 'text-zinc-400 hover:text-white bg-transparent border border-transparent'
           }`}
           title="Toggle Arterial Road Graph"
         >
-          <Navigation className="w-3 h-3" />
+          <Navigation className="w-3 h-3 text-sky-400" />
           <span>Roads</span>
         </button>
 
         <button
           onClick={() => setShowHospitals(!showHospitals)}
-          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition cursor-pointer ${
+          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition cursor-pointer ${
             showHospitals
-              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
-              : 'text-slate-400 hover:text-white bg-white/[0.03] border border-transparent'
+              ? 'bg-zinc-700 text-white border border-zinc-600 shadow-sm'
+              : 'text-zinc-400 hover:text-white bg-transparent border border-transparent'
           }`}
           title="Toggle Major Hospitals"
         >
-          <Building2 className="w-3 h-3" />
+          <Building2 className="w-3 h-3 text-emerald-400" />
           <span>Hospitals</span>
         </button>
 
         <button
           onClick={() => setShowShelters(!showShelters)}
-          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition cursor-pointer ${
+          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium transition cursor-pointer ${
             showShelters
-              ? 'bg-violet-500/20 text-violet-300 border border-violet-500/40 shadow-sm'
-              : 'text-slate-400 hover:text-white bg-white/[0.03] border border-transparent'
+              ? 'bg-zinc-700 text-white border border-zinc-600 shadow-sm'
+              : 'text-zinc-400 hover:text-white bg-transparent border border-transparent'
           }`}
           title="Toggle Evacuation Shelters"
         >
-          <Tent className="w-3 h-3" />
+          <Tent className="w-3 h-3 text-indigo-400" />
           <span>Shelters</span>
         </button>
 
         <button
           onClick={handleRecenter}
-          className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.1] text-slate-300 hover:text-emerald-400 border border-white/[0.08] transition cursor-pointer"
+          className="p-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700 transition cursor-pointer"
           title="Recenter Map on Chennai"
         >
           <Compass className="w-3.5 h-3.5" />
@@ -388,29 +388,29 @@ export const ChennaiMap: React.FC<Props> = ({
       </div>
 
       {/* Map Layer Legend Overlay */}
-      <div className="absolute bottom-3.5 left-3.5 z-[1000] bg-[#0e121b]/85 backdrop-blur-xl px-3.5 py-2 rounded-xl border border-white/[0.1] text-[11px] text-slate-300 flex flex-wrap gap-x-4 gap-y-1.5 shadow-2xl">
+      <div className="absolute bottom-3.5 left-3.5 z-[1000] bg-zinc-900/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-zinc-800 text-[11px] text-zinc-300 flex flex-wrap gap-x-4 gap-y-1.5 shadow-lg">
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-rose-500/30 animate-pulse" />
+          <span className="w-2 h-2 rounded-full bg-red-500" />
           <span>Critical Zone</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+          <span className="w-2 h-2 rounded-full bg-amber-400" />
           <span>High Risk Zone</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-4 h-0.5 border-t-2 border-dashed border-rose-500" />
+          <span className="w-3.5 h-0.5 border-t-2 border-dashed border-red-500" />
           <span>Submerged Bridge</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+          <span className="w-2 h-2 rounded-full bg-emerald-400" />
           <span>Operational Hospital</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-violet-400" />
+          <span className="w-2 h-2 rounded-full bg-indigo-400" />
           <span>Relief Shelter</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-teal-400 border border-yellow-400" />
+          <span className="w-2 h-2 rounded-full bg-teal-400" />
           <span>Staging Post</span>
         </div>
       </div>
