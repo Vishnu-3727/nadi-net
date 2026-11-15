@@ -81,10 +81,11 @@ export const Sidebar: React.FC<Props> = ({
   ];
 
   return (
-    <aside className="w-64 bg-[#090e17] border-r border-slate-800 flex flex-col justify-between p-4 shrink-0">
+    <aside className="w-64 bg-[#080d1a] border-r border-slate-800/80 flex flex-col justify-between p-3.5 shrink-0 select-none shadow-xl">
       <div className="space-y-1">
-        <div className="px-3 py-2 text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-500">
-          OPERATIONAL MODULES
+        <div className="px-3 py-2 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+          <span>OPERATIONAL MODULES</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
         </div>
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -94,19 +95,25 @@ export const Sidebar: React.FC<Props> = ({
             <button
               key={item.id}
               onClick={() => onSelectTab(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-medium transition cursor-pointer ${
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition cursor-pointer group ${
                 isActive
-                  ? 'bg-cyan-950/70 text-cyan-300 border border-cyan-800 shadow-sm'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+                  ? 'bg-gradient-to-r from-cyan-950/90 via-slate-900/80 to-transparent border-l-2 border-l-cyan-400 border-y border-r border-cyan-800/50 text-white shadow-lg shadow-cyan-950/30'
+                  : 'text-slate-400 hover:text-slate-100 hover:bg-slate-900/60 border border-transparent'
               }`}
             >
               <div className="flex items-center space-x-2.5">
-                <Icon className={`w-4 h-4 ${isActive ? 'text-cyan-400' : 'text-slate-400'}`} />
-                <span>{item.label}</span>
+                <Icon
+                  className={`w-4 h-4 transition duration-200 ${
+                    isActive
+                      ? 'text-cyan-400 scale-110 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]'
+                      : 'text-slate-400 group-hover:text-slate-200'
+                  }`}
+                />
+                <span className={isActive ? 'font-semibold text-white' : ''}>{item.label}</span>
               </div>
               {item.badge && (
                 <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded font-mono border ${item.badgeColor}`}
+                  className={`text-[9px] px-2 py-0.5 rounded-full font-mono font-bold uppercase tracking-wider border shadow-sm ${item.badgeColor}`}
                 >
                   {item.badge}
                 </span>
@@ -116,14 +123,17 @@ export const Sidebar: React.FC<Props> = ({
         })}
       </div>
 
-      {/* Footer Info */}
-      <div className="border-t border-slate-800/80 pt-4 px-2 space-y-2">
-        <div className="text-[11px] font-mono text-slate-400">
-          <div className="text-slate-500 uppercase tracking-wider text-[9px]">ENGINE PLATFORM</div>
-          <div className="font-semibold text-slate-300 mt-0.5">Google OR-Tools + NetworkX</div>
-          <div className="text-[10px] text-slate-500">AHP MCDA Risk Engine</div>
+      {/* Footer System Specs */}
+      <div className="border-t border-slate-800/80 pt-4 px-2 space-y-2.5">
+        <div className="p-3 rounded-xl bg-slate-900/50 border border-slate-800 text-[11px] font-mono text-slate-400">
+          <div className="text-slate-500 uppercase tracking-wider text-[9px] font-bold">ALGORITHMIC STACK</div>
+          <div className="font-semibold text-slate-200 mt-1 flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span>OR-Tools MILP + NetworkX</span>
+          </div>
+          <div className="text-[10px] text-cyan-400/80 mt-0.5">AHP MCDA Risk Engine (EPSG:4326)</div>
         </div>
-        <div className="text-[10px] text-slate-500 pt-1 border-t border-slate-800/50">
+        <div className="text-[10px] text-slate-500 px-1 font-mono">
           K! Hacks 4.0 — CEG Anna University
         </div>
       </div>

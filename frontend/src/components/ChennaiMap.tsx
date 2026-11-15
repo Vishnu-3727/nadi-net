@@ -1,5 +1,13 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
+import {
+  Layers,
+  MapPin,
+  Building2,
+  Tent,
+  Navigation,
+  Compass,
+} from 'lucide-react';
 import { ZoneRiskAssessmentData, RoadNetworkData, FacilitiesData, RouteDetailData } from '../types';
 
 interface Props {
@@ -23,14 +31,18 @@ export const ChennaiMap: React.FC<Props> = ({
   activeRoute,
   selectedZoneId,
   onSelectZone,
-  showRoads = true,
-  showHospitals = true,
-  showShelters = true,
-  showZones = true,
+  showRoads: initialShowRoads = true,
+  showHospitals: initialShowHospitals = true,
+  showShelters: initialShowShelters = true,
+  showZones: initialShowZones = true,
   height = '520px',
 }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const [showZones, setShowZones] = useState<boolean>(initialShowZones);
+  const [showRoads, setShowRoads] = useState<boolean>(initialShowRoads);
+  const [showHospitals, setShowHospitals] = useState<boolean>(initialShowHospitals);
+  const [showShelters, setShowShelters] = useState<boolean>(initialShowShelters);
   const layersRef = useRef<{
     zonesLayer?: L.LayerGroup;
     roadsLayer?: L.LayerGroup;
@@ -302,14 +314,83 @@ export const ChennaiMap: React.FC<Props> = ({
     map.fitBounds(routeLine.getBounds(), { padding: [40, 40], maxZoom: 14 });
   }, [activeRoute]);
 
+  const handleRecenter = () => {
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.setView([13.045, 80.225], 11, { animate: true });
+    }
+  };
+
   return (
-    <div className="relative w-full rounded-xl overflow-hidden border border-slate-800 shadow-2xl bg-[#090e17]">
+    <div className="relative w-full rounded-2xl overflow-hidden border border-slate-800/90 shadow-2xl bg-[#080d1a] ring-1 ring-white/5">
       <div ref={mapContainerRef} style={{ height }} className="z-10" />
 
+      {/* Floating Layer Controls (WeCare Style) */}
+      <div className="absolute top-3 right-3 z-[1000] flex flex-wrap items-center gap-1.5 bg-slate-900/90 backdrop-blur-md p-1.5 rounded-xl border border-slate-700/80 shadow-2xl">
+        <button
+          onClick={() => setShowZones(!showZones)}
+          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-semibold transition cursor-pointer ${
+            showZones
+              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 shadow-sm'
+              : 'text-slate-400 hover:text-white bg-slate-800/50 border border-transparent'
+          }`}
+          title="Toggle 15 GCC Zones"
+        >
+          <MapPin className="w-3 h-3" />
+          <span>Zones</span>
+        </button>
+
+        <button
+          onClick={() => setShowRoads(!showRoads)}
+          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-semibold transition cursor-pointer ${
+            showRoads
+              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 shadow-sm'
+              : 'text-slate-400 hover:text-white bg-slate-800/50 border border-transparent'
+          }`}
+          title="Toggle Arterial Road Graph"
+        >
+          <Navigation className="w-3 h-3" />
+          <span>Roads</span>
+        </button>
+
+        <button
+          onClick={() => setShowHospitals(!showHospitals)}
+          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-semibold transition cursor-pointer ${
+            showHospitals
+              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shadow-sm'
+              : 'text-slate-400 hover:text-white bg-slate-800/50 border border-transparent'
+          }`}
+          title="Toggle Major Hospitals"
+        >
+          <Building2 className="w-3 h-3" />
+          <span>Hospitals</span>
+        </button>
+
+        <button
+          onClick={() => setShowShelters(!showShelters)}
+          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-semibold transition cursor-pointer ${
+            showShelters
+              ? 'bg-blue-500/20 text-blue-300 border border-blue-500/50 shadow-sm'
+              : 'text-slate-400 hover:text-white bg-slate-800/50 border border-transparent'
+          }`}
+          title="Toggle Evacuation Shelters"
+        >
+          <Tent className="w-3 h-3" />
+          <span>Shelters</span>
+        </button>
+
+        <button
+          onClick={handleRecenter}
+          className="p-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-cyan-400 border border-slate-700 transition cursor-pointer"
+          title="Recenter Map on Chennai"
+        >
+          <Compass className="w-3.5 h-3.5" />
+        </button>
+      </div>
+
       {/* Map Layer Legend Overlay */}
-      <div className="absolute bottom-3 left-3 z-[1000] bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-lg border border-slate-700/80 text-[11px] text-slate-300 flex flex-wrap gap-x-4 gap-y-1.5 shadow-xl">
+      <div className="absolute bottom-3 left-3 z-[1000] bg-slate-900/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-slate-700/80 text-[11px] text-slate-300 flex flex-wrap gap-x-4 gap-y-1.5 shadow-2xl">
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
+          <span className="w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-red-500/20 animate-pulse" />
           <span>Critical Zone</span>
         </div>
         <div className="flex items-center gap-1.5">

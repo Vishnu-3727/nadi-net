@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TopBar } from './components/TopBar';
 import { Sidebar, NavTab } from './components/Sidebar';
+import { IncidentReportModal } from './components/IncidentReportModal';
 import { CommandCentrePage } from './pages/CommandCentrePage';
 import { FloodIntelligencePage } from './pages/FloodIntelligencePage';
 import { GeospatialPage } from './pages/GeospatialPage';
@@ -33,6 +34,8 @@ export function App() {
   const [selectedZone, setSelectedZone] = useState<ZoneRiskAssessmentData | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isResetting, setIsResetting] = useState<boolean>(false);
+  const [isSOSModalOpen, setIsSOSModalOpen] = useState<boolean>(false);
+  const [reportedIncidents, setReportedIncidents] = useState<any[]>([]);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const fetchAllData = async () => {
@@ -82,14 +85,59 @@ export function App() {
     setSelectedZone(zone);
   };
 
+  const handleIncidentReported = (incident: any) => {
+    setReportedIncidents((prev) => [incident, ...prev]);
+    if (overview) {
+      const newAlert = {
+        id: incident.id,
+        severity: incident.severity,
+        zone_id: Number(incident.zone_id) || 2,
+        zone_name: incident.zone_name,
+        message: `${incident.location}: ${incident.category.toUpperCase()} (${incident.affected_count} stranded citizens)`,
+        timestamp: incident.timestamp || 'Just now',
+        action_required: incident.need_boat
+          ? 'Dispatch Amphibious Motorboat & Rescue Team'
+          : 'Dispatch High-Clearance 4WD Truck',
+        provenance: 'SIMULATED' as const,
+      };
+      setOverview({
+        ...overview,
+        alerts: [newAlert, ...overview.alerts],
+      });
+    }
+  };
+
+  const availableZonesForModal = (riskData?.zones || []).map((z) => ({
+    zone_id: z.zone_id,
+    zone_name: z.name,
+  }));
+
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#0b1120] text-slate-100 overflow-hidden font-sans">
+    <div className="flex flex-col h-screen w-screen bg-[#070b14] text-slate-100 overflow-hidden font-sans">
       {/* Persistent Disaster Operations TopBar */}
       <TopBar
         activeScenarioName={overview?.active_scenario_name || 'Scenario A (Moderate)'}
         activeSeverity={overview?.active_severity || 'MODERATE'}
         onReset={handleResetScenario}
+        onOpenSOS={() => setIsSOSModalOpen(true)}
         isResetting={isResetting}
+      />
+
+      {/* Citizen SOS & Field Incident Modal (WeCare Inspired) */}
+      <IncidentReportModal
+        isOpen={isSOSModalOpen}
+        onClose={() => setIsSOSModalOpen(false)}
+        onIncidentReported={handleIncidentReported}
+        availableZones={
+          availableZonesForModal.length > 0
+            ? availableZonesForModal
+            : [
+                { zone_id: 2, zone_name: 'Manali' },
+                { zone_id: 13, zone_name: 'Adyar' },
+                { zone_id: 14, zone_name: 'Perungudi' },
+                { zone_id: 15, zone_name: 'Sholinganallur' },
+              ]
+        }
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -98,11 +146,11 @@ export function App() {
           activeTab={activeTab}
           onSelectTab={setActiveTab}
           unmetCount={allocations?.unmet_zones_count || 0}
-          criticalCount={overview?.alerts.length || 0}
+          criticalCount={(overview?.alerts.length || 0) + reportedIncidents.length}
         />
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto p-6 bg-[#0b1120]">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#070b14]">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-full space-y-3 font-mono text-sm text-cyan-400">
               <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
@@ -128,6 +176,8 @@ export function App() {
                   roadNetwork={roadNetwork}
                   facilities={facilities}
                   allocations={allocations}
+                  reportedIncidents={reportedIncidents}
+                  onOpenSOS={() => setIsSOSModalOpen(true)}
                   onNavigateTab={setActiveTab}
                   onSelectZone={handleSelectZone}
                 />
