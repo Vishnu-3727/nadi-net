@@ -131,40 +131,92 @@ NADI-NET explicitly labels every data point with its provenance class:
 
 ---
 
-## 5. Quick Start & Installation
+## 5. Quick Start & Step-by-Step Run Guide
 
 ### Prerequisites
-- Python 3.10+ (tested on Python 3.11, 3.12, 3.13)
-- Node.js 18+ and npm
-- Windows 11 / Linux / macOS
+- **Python:** 3.10 to 3.13 (`python --version`)
+- **Node.js:** 18+ and npm (`node -v` and `npm -v`)
+- **Git:** (`git --version`)
+- Supported OS: Windows 10/11, Ubuntu/Debian/Linux, macOS
 
-### 1. Clone & Setup Workspace
+---
+
+### Step 1: Clone the Repository
+Open your terminal (PowerShell, Git Bash, or Terminal):
 ```bash
 git clone https://github.com/Vishnu-3727/nadi-net.git
 cd nadi-net
 ```
 
-### 2. Backend Setup
+---
+
+### Step 2: Backend Setup & Launch
+
+#### A. Create & Activate Virtual Environment (Recommended)
+- **Windows (Git Bash):**
+  ```bash
+  python -m venv venv
+  source venv/Scripts/activate
+  ```
+- **Windows (PowerShell):**
+  ```powershell
+  python -m venv venv
+  .\venv\Scripts\Activate.ps1
+  ```
+- **Linux / macOS:**
+  ```bash
+  python3 -m venv venv
+  source venv/bin/activate
+  ```
+
+#### B. Install Python Dependencies
 ```bash
-# Install Python dependencies
-pip install -r backend/requirements.txt
+pip install -r requirements.txt
+```
 
-# Initialize database & seed baseline Chennai datasets
+#### C. Validate Datasets & Initialize Database
+```bash
+# 1. Verify CRS (EPSG:4326), zone boundaries and road graph topology (100% offline)
+python scripts/validate_datasets.py
+
+# 2. Seed database tables and execute baseline scenario
 python scripts/seed_database.py
+```
 
-# Run FastAPI backend
+#### D. Start the FastAPI Backend Server
+```bash
 python -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
-API Documentation will be live at: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **Backend API:** [http://127.0.0.1:8000](http://127.0.0.1:8000)
+- **Interactive Swagger Docs:** [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
-### 3. Frontend Setup
-In a second terminal:
+---
+
+### Step 3: Frontend Setup & Launch
+Open a **new, second terminal window** in the `nadi-net` directory:
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+The Command Centre web application will start immediately:
+- **Application URL:** [http://localhost:5173](http://localhost:5173)
+
+---
+
+### Step 4: Run Verification Tests (80 / 80 Passing)
+In the first terminal (with virtual environment active):
+```bash
+python -m pytest backend/tests -v
+```
+All 80 tests verify:
+- MCDA flood risk calculations and confidence scoring.
+- Scenario flood depth bounds and vehicle wading limits.
+- Separate road and water routing with boat transfer ramps.
+- OR-Tools MILP team exclusivity, shelter capacity, and supply conservation.
+- Real-time dynamic replanning and critical road link restoration ranking.
 
 ---
 
