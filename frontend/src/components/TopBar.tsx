@@ -35,57 +35,60 @@ export const TopBar: React.FC<Props> = ({
       : 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
 
   return (
-    <header className="h-16 bg-[#090e17] border-b border-slate-800 px-6 flex items-center justify-between sticky top-0 z-50">
+    <header className="min-h-16 py-2 bg-[#090e17] border-b border-slate-800 px-4 sm:px-6 flex items-center justify-between gap-3 sticky top-0 z-50">
       {/* Title & Brand */}
-      <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-600 to-blue-700 flex items-center justify-center shadow-lg shadow-cyan-900/30">
-          <ShieldAlert className="w-6 h-6 text-white" />
+      <div className="flex items-center space-x-3 shrink-0">
+        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-cyan-600 to-blue-700 flex items-center justify-center shadow-lg shadow-cyan-900/30 shrink-0">
+          <ShieldAlert className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
         </div>
         <div>
           <div className="flex items-center space-x-2">
-            <h1 className="text-lg font-bold tracking-tight text-white font-mono">
+            <h1 className="text-base sm:text-lg font-bold tracking-tight text-white font-mono leading-none">
               NADI-NET
             </h1>
             <span className="text-[10px] px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800 font-mono">
               v1.0 CEG K!HACKS
             </span>
           </div>
-          <p className="text-[11px] text-slate-400 font-medium">
+          <p className="text-[11px] text-slate-400 font-medium hidden md:block">
             Chennai Urban Flood Response Intelligence & Emergency Resource Optimisation
           </p>
         </div>
       </div>
 
       {/* Middle Status Indicators */}
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center space-x-2 sm:space-x-3 shrink-0">
         {/* Active Scenario Badge */}
-        <div className="flex items-center space-x-2 bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-800">
-          <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-          <span className="text-xs text-slate-400 font-mono">Active Scenario:</span>
-          <span className={`text-xs font-semibold px-2 py-0.5 rounded border ${severityColor}`}>
+        <div className="flex items-center space-x-2 bg-slate-900/80 px-2.5 py-1.5 rounded-lg border border-slate-800">
+          <Radio className="w-3.5 h-3.5 text-cyan-400 animate-pulse shrink-0" />
+          <span className="text-xs text-slate-400 font-mono hidden xl:inline">Scenario:</span>
+          <span
+            className={`text-xs font-semibold px-2 py-0.5 rounded border whitespace-nowrap truncate max-w-[140px] sm:max-w-[220px] md:max-w-xs ${severityColor}`}
+            title={activeScenarioName}
+          >
             {activeScenarioName}
           </span>
         </div>
 
         {/* Offline Self-Contained Guarantee */}
-        <div className="hidden lg:flex items-center space-x-1.5 text-xs text-emerald-400/90 bg-emerald-950/40 border border-emerald-800/40 px-2.5 py-1.5 rounded-lg font-mono">
-          <Database className="w-3.5 h-3.5" />
-          <span>OFFLINE DEMO READY</span>
+        <div className="hidden lg:flex items-center space-x-1.5 text-xs text-emerald-400/90 bg-emerald-950/40 border border-emerald-800/40 px-2.5 py-1.5 rounded-lg font-mono whitespace-nowrap">
+          <Database className="w-3.5 h-3.5 shrink-0" />
+          <span>OFFLINE READY</span>
         </div>
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center space-x-3">
+      <div className="flex items-center space-x-3 shrink-0">
         <div className="text-right hidden sm:block">
-          <div className="text-xs font-mono text-slate-200 font-medium">{currentTime}</div>
-          <div className="text-[10px] text-slate-500 font-mono">GCC Emergency Ops Grid</div>
+          <div className="text-xs font-mono text-slate-200 font-medium leading-tight">{currentTime}</div>
+          <div className="text-[10px] text-slate-500 font-mono leading-tight">GCC Ops Grid</div>
         </div>
 
         {/* Reset button */}
         <button
           onClick={onReset}
           disabled={isResetting}
-          className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg border border-slate-700 text-xs font-medium transition cursor-pointer disabled:opacity-50"
+          className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white rounded-lg border border-slate-700 text-xs font-medium transition cursor-pointer disabled:opacity-50 whitespace-nowrap"
           title="Reset emergency scenario to baseline Scenario A"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isResetting ? 'animate-spin text-cyan-400' : ''}`} />

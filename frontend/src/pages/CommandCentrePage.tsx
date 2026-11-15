@@ -58,7 +58,7 @@ export const CommandCentrePage: React.FC<Props> = ({
     <div className="space-y-6">
       {/* 1. Emergency Severity Banner */}
       <div
-        className={`p-4 rounded-xl border flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg ${
+        className={`p-4 rounded-xl border flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-lg ${
           overview.active_severity === 'CRITICAL'
             ? 'bg-red-950/40 border-red-800/80 text-red-200'
             : overview.active_severity === 'SEVERE'
@@ -66,9 +66,9 @@ export const CommandCentrePage: React.FC<Props> = ({
             : 'bg-emerald-950/40 border-emerald-800/80 text-emerald-200'
         }`}
       >
-        <div className="flex items-center space-x-3.5">
+        <div className="flex items-center space-x-3.5 min-w-0">
           <div
-            className={`p-2.5 rounded-lg ${
+            className={`p-2.5 rounded-lg shrink-0 ${
               overview.active_severity === 'CRITICAL'
                 ? 'bg-red-500/20 text-red-400'
                 : overview.active_severity === 'SEVERE'
@@ -78,26 +78,26 @@ export const CommandCentrePage: React.FC<Props> = ({
           >
             <AlertTriangle className="w-6 h-6 animate-pulse" />
           </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-mono font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-black/40 border border-current">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-mono font-bold tracking-wider uppercase px-2 py-0.5 rounded bg-black/40 border border-current shrink-0">
                 SEVERITY: {overview.active_severity}
               </span>
-              <span className="text-sm font-bold text-white">
+              <span className="text-sm font-bold text-white truncate">
                 {overview.active_scenario_name}
               </span>
             </div>
-            <p className="text-xs text-slate-300 mt-0.5">
+            <p className="text-xs text-slate-300 mt-1 line-clamp-2">
               Coordinated Decision-Support Grid for Greater Chennai Corporation (GCC) & State Disaster Management Authority
             </p>
           </div>
         </div>
 
-        <div className="flex items-center space-x-2 shrink-0">
+        <div className="flex items-center space-x-2 shrink-0 self-end md:self-auto">
           <ProvenanceBadge provenance="SIMULATED" size="sm" />
           <button
             onClick={() => onNavigateTab('simulator')}
-            className="px-3 py-1.5 bg-black/50 hover:bg-black/80 text-white rounded-lg text-xs font-medium border border-current transition flex items-center space-x-1 cursor-pointer"
+            className="px-3 py-1.5 bg-black/50 hover:bg-black/80 text-white rounded-lg text-xs font-medium border border-current transition flex items-center space-x-1 cursor-pointer whitespace-nowrap"
           >
             <span>Change Scenario</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -106,7 +106,7 @@ export const CommandCentrePage: React.FC<Props> = ({
       </div>
 
       {/* 2. Key Metrics Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3">
         {overview.metrics.map((m, idx) => {
           let statusBorder = 'border-slate-800';
           let valColor = 'text-white';
@@ -126,18 +126,18 @@ export const CommandCentrePage: React.FC<Props> = ({
           return (
             <div
               key={idx}
-              className={`p-3.5 rounded-xl border flex flex-col justify-between ${statusBorder}`}
+              className={`p-3 rounded-xl border flex flex-col justify-between min-h-[105px] overflow-hidden ${statusBorder}`}
             >
               <div>
-                <div className="flex items-center justify-between gap-1 mb-1.5">
-                  <span className="text-[11px] font-medium text-slate-400">{m.label}</span>
+                <div className="flex items-start justify-between gap-1.5 mb-2">
+                  <span className="text-[11px] font-medium text-slate-400 leading-tight line-clamp-1">{m.label}</span>
                   <ProvenanceBadge provenance={m.provenance} size="sm" />
                 </div>
-                <div className={`text-xl font-bold font-mono tracking-tight ${valColor}`}>
+                <div className={`text-lg sm:text-xl font-bold font-mono tracking-tight leading-none mt-1 ${valColor}`}>
                   {m.value}
                 </div>
               </div>
-              <div className="text-[10px] text-slate-500 mt-2 line-clamp-1">{m.subtext}</div>
+              <div className="text-[10px] text-slate-500 mt-2 truncate">{m.subtext}</div>
             </div>
           );
         })}
