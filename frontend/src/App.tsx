@@ -113,7 +113,7 @@ export function App() {
   }));
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-[#070b14] text-slate-100 overflow-hidden font-sans">
+    <div className="flex flex-col h-screen w-screen bg-[#080a10] text-slate-100 overflow-hidden font-sans">
       {/* Persistent Disaster Operations TopBar */}
       <TopBar
         activeScenarioName={overview?.active_scenario_name || 'Scenario A (Moderate)'}
@@ -150,7 +150,7 @@ export function App() {
         />
 
         {/* Main Content Area */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#070b14]">
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-[#080a10]">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center h-full space-y-3 font-mono text-sm text-cyan-400">
               <div className="w-8 h-8 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />

@@ -321,17 +321,17 @@ export const ChennaiMap: React.FC<Props> = ({
   };
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden border border-slate-800/90 shadow-2xl bg-[#080d1a] ring-1 ring-white/5">
+    <div className="relative w-full rounded-2xl overflow-hidden border border-white/[0.08] shadow-2xl bg-[#07090e] ring-1 ring-white/5">
       <div ref={mapContainerRef} style={{ height }} className="z-10" />
 
-      {/* Floating Layer Controls (WeCare Style) */}
-      <div className="absolute top-3 right-3 z-[1000] flex flex-wrap items-center gap-1.5 bg-slate-900/90 backdrop-blur-md p-1.5 rounded-xl border border-slate-700/80 shadow-2xl">
+      {/* Floating Layer Controls (WeCare Style Glass Island) */}
+      <div className="absolute top-3.5 right-3.5 z-[1000] flex flex-wrap items-center gap-1.5 bg-[#0e121b]/85 backdrop-blur-xl p-1.5 rounded-xl border border-white/[0.1] shadow-2xl">
         <button
           onClick={() => setShowZones(!showZones)}
-          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-semibold transition cursor-pointer ${
+          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition cursor-pointer ${
             showZones
-              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 shadow-sm'
-              : 'text-slate-400 hover:text-white bg-slate-800/50 border border-transparent'
+              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm'
+              : 'text-slate-400 hover:text-white bg-white/[0.03] border border-transparent'
           }`}
           title="Toggle 15 GCC Zones"
         >
@@ -341,10 +341,10 @@ export const ChennaiMap: React.FC<Props> = ({
 
         <button
           onClick={() => setShowRoads(!showRoads)}
-          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-semibold transition cursor-pointer ${
+          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition cursor-pointer ${
             showRoads
-              ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/50 shadow-sm'
-              : 'text-slate-400 hover:text-white bg-slate-800/50 border border-transparent'
+              ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm'
+              : 'text-slate-400 hover:text-white bg-white/[0.03] border border-transparent'
           }`}
           title="Toggle Arterial Road Graph"
         >
@@ -354,10 +354,10 @@ export const ChennaiMap: React.FC<Props> = ({
 
         <button
           onClick={() => setShowHospitals(!showHospitals)}
-          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-semibold transition cursor-pointer ${
+          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition cursor-pointer ${
             showHospitals
-              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/50 shadow-sm'
-              : 'text-slate-400 hover:text-white bg-slate-800/50 border border-transparent'
+              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm'
+              : 'text-slate-400 hover:text-white bg-white/[0.03] border border-transparent'
           }`}
           title="Toggle Major Hospitals"
         >
@@ -367,10 +367,10 @@ export const ChennaiMap: React.FC<Props> = ({
 
         <button
           onClick={() => setShowShelters(!showShelters)}
-          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-semibold transition cursor-pointer ${
+          className={`flex items-center space-x-1 px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold transition cursor-pointer ${
             showShelters
-              ? 'bg-blue-500/20 text-blue-300 border border-blue-500/50 shadow-sm'
-              : 'text-slate-400 hover:text-white bg-slate-800/50 border border-transparent'
+              ? 'bg-violet-500/20 text-violet-300 border border-violet-500/40 shadow-sm'
+              : 'text-slate-400 hover:text-white bg-white/[0.03] border border-transparent'
           }`}
           title="Toggle Evacuation Shelters"
         >
@@ -380,7 +380,7 @@ export const ChennaiMap: React.FC<Props> = ({
 
         <button
           onClick={handleRecenter}
-          className="p-1 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-cyan-400 border border-slate-700 transition cursor-pointer"
+          className="p-1.5 rounded-lg bg-white/[0.04] hover:bg-white/[0.1] text-slate-300 hover:text-emerald-400 border border-white/[0.08] transition cursor-pointer"
           title="Recenter Map on Chennai"
         >
           <Compass className="w-3.5 h-3.5" />
@@ -388,9 +388,9 @@ export const ChennaiMap: React.FC<Props> = ({
       </div>
 
       {/* Map Layer Legend Overlay */}
-      <div className="absolute bottom-3 left-3 z-[1000] bg-slate-900/90 backdrop-blur-md px-3.5 py-2 rounded-xl border border-slate-700/80 text-[11px] text-slate-300 flex flex-wrap gap-x-4 gap-y-1.5 shadow-2xl">
+      <div className="absolute bottom-3.5 left-3.5 z-[1000] bg-[#0e121b]/85 backdrop-blur-xl px-3.5 py-2 rounded-xl border border-white/[0.1] text-[11px] text-slate-300 flex flex-wrap gap-x-4 gap-y-1.5 shadow-2xl">
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-red-500/20 animate-pulse" />
+          <span className="w-2.5 h-2.5 rounded-full bg-rose-500 ring-2 ring-rose-500/30 animate-pulse" />
           <span>Critical Zone</span>
         </div>
         <div className="flex items-center gap-1.5">
@@ -398,20 +398,20 @@ export const ChennaiMap: React.FC<Props> = ({
           <span>High Risk Zone</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-4 h-0.5 border-t-2 border-dashed border-red-500" />
-          <span>Blocked River Crossing</span>
+          <span className="w-4 h-0.5 border-t-2 border-dashed border-rose-500" />
+          <span>Submerged Bridge</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
           <span>Operational Hospital</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
+          <span className="w-2.5 h-2.5 rounded-full bg-violet-400" />
           <span>Relief Shelter</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-full bg-purple-500 border border-yellow-400" />
-          <span>Rescue Staging Post</span>
+          <span className="w-2.5 h-2.5 rounded-full bg-teal-400 border border-yellow-400" />
+          <span>Staging Post</span>
         </div>
       </div>
     </div>
